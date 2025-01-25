@@ -173,28 +173,17 @@ class Editor:
                     self.tiles[y][x] = -1
 
 
-    def mark_reachable(self):
-        reachable = [[False] * self.grid_width for _ in range(self.grid_height)]
-        for y in range(self.grid_height):
-            for x in range(self.grid_width):
-                for dx, dy in ((-1, 0), (0, -1), (1, 0), (0, 1)):
-                    x2 = x + dx
-                    y2 = y + dy
-                    if 0 <= x2 < self.grid_width and 0 <= y2 < self.grid_height \
-                            and self.tiles[y2][x2] != Editor.WALL_TILE_INDEX:
-                        reachable[y][x] = True
-        return reachable
-
     def save(self):
-        reachable = self.mark_reachable()
         with open(self.filename, "wb") as file:
-            tiles = [
-                [
-                    (8 if self.tiles[y][x] == Editor.WALL_TILE_INDEX and not reachable[y][x] else self.tiles[y][x]) + 1
-                    for x in range(self.grid_width)
-                ]
-                for y in range(self.grid_height)
-            ]
+            tiles = [[-1] * self.grid_width for _ in range(self.grid_height)]
+            for y in range(self.grid_height):
+                for x in range(self.grid_width):
+                    tile = self.tiles[y][x]
+                    if tile == Editor.WALL_TILE_INDEX:
+                        tile = 7 + self.get_wall_index(x, y)
+                        tile = Editor.WALL_TILE_INDEX if tile == 7 else tile
+                    tile += 1
+                    tiles[y][x] = tile
             pickle.dump(tiles, file)
 
     def load(self):
@@ -206,7 +195,7 @@ class Editor:
                 for y in range(self.grid_height):
                     for x in range(self.grid_width):
                         tile = self.tiles[y][x] - 1
-                        self.tiles[y][x] = Editor.WALL_TILE_INDEX if tile == 8 else tile
+                        self.tiles[y][x] = Editor.WALL_TILE_INDEX if tile >= 8 else tile
         except:
             pass
 
