@@ -9,6 +9,9 @@ class Editor:
     PLAYER_TILE_INDEX = 0
     WALL_TILE_INDEX = 1
 
+    # The first 2 tile codes are special, the others are in the same order as “filenames” below
+    tile_codes = ['-', ' ', 'P', 'W', '^', 'v', 'R', 'G', 'B', 'C']
+
     def __init__(self, filename):
         self.filename = filename
 
@@ -37,7 +40,7 @@ class Editor:
 
 
     def load_textures(self):
-        filenames = ['player', 'wall', 'hurt-down', 'bubble-red', 'bubble-green', 'bubble-blue']
+        filenames = ['player', 'wall', 'hurt-down', 'hurt-up', 'bubble-red', 'bubble-green', 'bubble-blue', 'checkpoint']
         self.textures = [
             pygame.image.load('src/textures/{}.png'.format(name)).convert_alpha()
             for name in filenames
@@ -86,26 +89,26 @@ class Editor:
     def check_scroll(self, event):
         if event.type == pygame.KEYDOWN:
             if event.scancode == 26: # Z
-                if event.mod & pygame.KMOD_CTRL != 0 and self.grid_height > 1:
+                if event.mod & pygame.KMOD_SHIFT != 0 and self.grid_height > 1:
                     self.grid_height -= 1
                     self.tiles.pop()
                 else:
                     self.scroll_y = max(0, self.scroll_y - self.tile_height)
             elif event.scancode == 4: # Q
-                if event.mod & pygame.KMOD_CTRL != 0 and self.grid_width > 1:
+                if event.mod & pygame.KMOD_SHIFT != 0 and self.grid_width > 1:
                     self.grid_width -= 1
                     for line in self.tiles:
                         line.pop()
                 else:
                     self.scroll_x = max(0, self.scroll_x - self.tile_width)
             elif event.scancode == 22: # S
-                if event.mod & pygame.KMOD_CTRL != 0:
+                if event.mod & pygame.KMOD_SHIFT != 0:
                     self.grid_height += 1
                     self.tiles.append([-1] * self.grid_width)
                 else:
                     self.scroll_y += self.tile_height
             elif event.scancode == 7: # D
-                if event.mod & pygame.KMOD_CTRL != 0:
+                if event.mod & pygame.KMOD_SHIFT != 0:
                     self.grid_width += 1
                     for line in self.tiles:
                         line.append(-1)
@@ -143,8 +146,6 @@ class Editor:
                 if self.tiles[y][x] == Editor.PLAYER_TILE_INDEX:
                     self.tiles[y][x] = -1
 
-
-    tile_codes = ['-', ' ', 'P', 'W', '^', 'R', 'G', 'B']
 
     def mark_reachable(self):
         reachable = [[False] * self.grid_width for _ in range(self.grid_height)]
