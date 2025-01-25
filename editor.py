@@ -18,18 +18,20 @@ class Editor:
         self.clock = pygame.time.Clock()
         self.max_fps = 60
 
-        self.load_textures()
-
-        self.tile_width = self.textures[1].get_width()
-        self.tile_height = self.textures[1].get_height()
+        self.tile_width = 40
+        self.tile_height = 40
         self.grid_width = self.screen.get_width() // self.tile_width
         self.grid_height = self.screen.get_height() // self.tile_height
         self.scroll_x = 0
         self.scroll_y = 0
 
         self.tiles = [[-1] * self.grid_width for _ in range(self.grid_height)]
-        self.tiles[1][1] = 0
+        self.tiles[3][1] = 0
         self.current_tile = Editor.WALL_TILE_INDEX
+
+        self.textures = None
+        self.wall_textures = None
+        self.load_textures()
 
         self.load()
 
@@ -37,11 +39,23 @@ class Editor:
 
 
     def load_textures(self):
-        filenames = ['crab_idle', 'wall', 'urchin', 'urchin', 'bubble-red', 'bubble-green', 'bubble-blue', 'checkpoint']
-        self.textures = [
-            pygame.image.load('src/textures/{}.png'.format(name)).convert_alpha()
-            for name in filenames
-        ]
+        self.textures = []
+        for name in ['crab', 'wall', 'urchin', 'urchin', 'bubble-red', 'bubble-green', 'bubble-blue', 'checkpoint']:
+            texture = pygame.image.load(f'src/textures/{name}.png').convert_alpha()
+            texture = pygame.transform.scale(texture, (self.tile_width, self.tile_height))
+            self.textures.append(texture)
+        directions = ['top', 'bottom', 'left', 'right']
+        self.wall_textures = [None] * (2 ** len(directions))
+        for index in range(2 ** len(directions)):
+            texture_dir = ''
+            for dir_index, direction in enumerate(directions):
+                if index & 1 << dir_index != 0:
+                    texture_dir += direction
+            filename = 'wall' if texture_dir == '' else f'wall-{texture_dir}'
+            filename = f'src/textures/{filename}.png'
+            texture = pygame.image.load(filename).convert_alpha()
+            texture = pygame.transform.scale(texture, (self.tile_width, self.tile_height))
+            self.wall_textures[index] = texture
 
 
     def loop(self):
@@ -54,6 +68,15 @@ class Editor:
 
             self.clock.tick(self.max_fps)
 
+
+    def get_wall_index(self, x, y):
+        index = 0
+        for dir_index, (dx, dy) in enumerate(((0, -1), (0, 1), (-1, 0), (1, 0))):
+            x2, y2 = x + dx, y + dy
+            if 0 <= x2 < self.grid_width and 0 <= y2 < self.grid_height \
+                    and self.tiles[y2][x2] != Editor.WALL_TILE_INDEX:
+                index |= 1 << dir_index
+        return index
 
     def texture_pos_px(self, x, y, texture):
         tile_x = self.tile_width * x + (self.tile_width - texture.get_width()) // 2 - self.scroll_x
@@ -70,9 +93,12 @@ class Editor:
         for y in range(self.grid_height):
             for x in range(self.grid_width):
                 tile = self.tiles[y][x]
+                texture = self.textures[tile]
                 if tile >= 0:
-                    tile_x, tile_y = self.texture_pos_px(x, y, self.textures[tile])
-                    screen.blit(self.textures[tile], (tile_x, tile_y))
+                    if tile == Editor.WALL_TILE_INDEX:
+                        texture = self.wall_textures[self.get_wall_index(x, y)]
+                    tile_x, tile_y = self.texture_pos_px(x, y, texture)
+                    screen.blit(texture, (tile_x, tile_y))
 
         current_texture = self.textures[self.current_tile].copy()
         current_texture.set_alpha(128)
