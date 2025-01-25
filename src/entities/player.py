@@ -6,21 +6,27 @@ class Player:
         self.pos = [0, 0]
         self.texture = None
 
-        self.max_x_momentum = 6
+        self.jump_power = -7
+
+        self.max_x_momentum = 5
         self.max_y_momentum = 15
         self.x_acceleration = .5
         self.y_acceleration = .3
         self.x_momentum = 0
         self.y_momentum = 0
 
-        self.rect = None
+        self.collide_top = False
+        self.collide_bottom = False
+        self.collide_left = False
+        self.collide_right = False
 
-        self.in_jump = True
+        self.rect = None
 
         self.load_texture()
 
     def load_texture(self):
         self.texture = pygame.image.load('./src/textures/player.png')
+        self.texture = pygame.transform.scale(self.texture, (20, 20))
         self.rect = self.texture.get_rect()
 
     def update_rect(self):
