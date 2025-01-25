@@ -13,14 +13,16 @@ class Main:
         # -- Window creation --
         pygame.init()
         pygame.display.set_caption("hello world!")
-        self.screen = pygame.display.set_mode((1080, 720))
+        self.screen_size = (1080, 720)
+        self.screen = pygame.display.set_mode(self.screen_size)
+        self.font = pygame.font.SysFont("Arial", 30)
         self.clock = pygame.time.Clock()
-        self.max_fps = 60
+        self.max_fps = 120
 
         self.playing = None
         self.dt = 0
         self.player = Player()
-        self.map = Map()
+        self.map = Map(self.screen_size)
 
         self.loop()
 
@@ -47,21 +49,24 @@ class Main:
             for x in range(len(grid[y])):
                 if grid[y][x] != 0:
                     rect = pygame.rect.Rect(0, 0, self.map.tile_size, self.map.tile_size)
-                    rect.topleft = (x*self.map.tile_size, y*self.map.tile_size)
+                    rect.topleft = (self.map.current_offset_x + x * self.map.tile_size, self.map.current_offset_y + y * self.map.tile_size)
                     self.map.tiles_rect.append(rect)
-                    screen.blit(self.map.tiles_texture[grid[y][x]-1], (x*self.map.tile_size, y*self.map.tile_size))
+                    screen.blit(self.map.tiles_texture[grid[y][x]-1], (self.map.current_offset_x + x*self.map.tile_size, self.map.current_offset_y + y*self.map.tile_size))
 
         screen.blit(self.player.texture, self.player.rect)
 
+        fps_text = self.font.render(f"FPS: {int(self.clock.get_fps())}", True, (255, 255, 255))
+        screen.blit(fps_text, (10, 10))
+
     def calculations(self):
         player = self.player
+        previous_player_pos = player.rect.topleft
         dt = self.dt * 60
         keys = pygame.key.get_pressed()
 
         # player.collide_bottom = False
-        if player.rect.bottom >= 720:
-            player.rect.bottom = 720
-            player.collide_bottom = True
+        if player.rect.bottom >= self.screen_size[1] + player.rect.height and self.map.current_offset_y < self.map.max_offset_y:
+            self.playing = False
 
         if not player.collide_bottom:
             if player.y_momentum < player.max_y_momentum:
@@ -72,11 +77,37 @@ class Main:
         else:
             player.y_momentum = 0
 
+
         self.controls(keys, dt)
 
         player.collide_bottom = False
 
         self.move_obj(player, dt)
+
+        current_player_pos = player.pos
+
+        # Scrolling
+        if player.pos[0] > self.screen_size[0] - self.screen_size[0]/2.5 and self.map.current_offset_x > self.map.max_offset_x:
+            self.map.current_offset_x += previous_player_pos[0] - current_player_pos[0]
+            player.pos[0] = previous_player_pos[0] - 1
+
+        if player.pos[0] < self.screen_size[0]/2.5 and self.map.current_offset_x < self.map.min_offset_x:
+            self.map.current_offset_x += previous_player_pos[0] - current_player_pos[0]
+            player.pos[0] = previous_player_pos[0] + 1
+
+
+        if player.pos[1] > self.screen_size[1] - self.screen_size[1]/2.5 and self.map.current_offset_y > self.map.max_offset_y:
+            self.map.current_offset_y += previous_player_pos[1] - current_player_pos[1]
+            player.pos[1] = previous_player_pos[1]
+
+        if player.pos[1] < self.screen_size[1]/2.5 and self.map.current_offset_y < self.map.min_offset_y:
+            self.map.current_offset_y += previous_player_pos[1] - current_player_pos[1]
+            player.pos[1] = previous_player_pos[1]
+
+        player.update_rect()
+
+
+
 
     def controls(self, keys, dt):
         # move player according to controls
@@ -100,7 +131,6 @@ class Main:
             self.player.y_momentum = self.player.jump_power
 
     def move_obj(self, obj, dt):
-
         obj.pos[1] += obj.y_momentum * dt
 
         obj.update_rect()
