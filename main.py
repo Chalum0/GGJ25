@@ -3,14 +3,12 @@ from src.settings.settings import *
 from src.terrain.map import Map
 
 import pygame
-import random
 import time
 import math
 
 
 class Main:
     def __init__(self):
-        # -- Window creation --
         pygame.init()
         pygame.display.set_caption("hello world!")
         self.screen_size = (1080, 720)

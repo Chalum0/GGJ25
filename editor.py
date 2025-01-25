@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 
 import pygame
-from queue import Queue
+import pickle
 
 
 class Editor:
 
     PLAYER_TILE_INDEX = 0
     WALL_TILE_INDEX = 1
-
-    # The first 2 tile codes are special, the others are in the same order as “filenames” below
-    tile_codes = ['-', ' ', 'P', 'W', '^', 'v', 'R', 'G', 'B', 'C']
 
     def __init__(self, filename):
         self.filename = filename
@@ -149,46 +146,38 @@ class Editor:
 
     def mark_reachable(self):
         reachable = [[False] * self.grid_width for _ in range(self.grid_height)]
-        queue = Queue()
         for y in range(self.grid_height):
             for x in range(self.grid_width):
-                if self.tiles[y][x] == Editor.PLAYER_TILE_INDEX:
-                    reachable[y][x] = True
-                    queue.put((x, y))
-        while not queue.empty():
-            x, y = queue.get()
-            for dx, dy in ((-1, 0), (0, -1), (1, 0), (0, 1)):
-                x2 = x + dx
-                y2 = y + dy
-                if 0 <= x2 < self.grid_width and 0 <= y2 < self.grid_height \
-                        and not reachable[y2][x2]:
-                    reachable[y2][x2] = True
-                    if self.tiles[y2][x2] < 0:
-                        queue.put((x2, y2))
+                for dx, dy in ((-1, 0), (0, -1), (1, 0), (0, 1)):
+                    x2 = x + dx
+                    y2 = y + dy
+                    if x2 < 0 or self.grid_width <= x2 or y2 < 0 or self.grid_height <= y2 \
+                            or self.tiles[y][x] != Editor.WALL_TILE_INDEX:
+                        reachable[y][x] = True
         return reachable
 
     def save(self):
         reachable = self.mark_reachable()
-        with open(self.filename, "w") as file:
-            for y in range(self.grid_height):
-                for x in range(self.grid_width):
-                    tile = self.tiles[y][x]
-                    if tile == Editor.WALL_TILE_INDEX and not reachable[y][x]:
-                        tile = -2
-                    file.write(Editor.tile_codes[tile + 2])
-                file.write('\n')
+        with open(self.filename, "wb") as file:
+            tiles = [
+                [
+                    (8 if self.tiles[y][x] == Editor.WALL_TILE_INDEX and not reachable[y][x] else self.tiles[y][x]) + 1
+                    for x in range(self.grid_width)
+                ]
+                for y in range(self.grid_height)
+            ]
+            pickle.dump(tiles, file)
 
     def load(self):
         try:
-            with open(self.filename, "r") as file:
-                lines = file.readlines()
-                self.grid_width = len(lines[0]) - 1
-                self.grid_height = len(lines)
-                self.tiles = [[-1] * self.grid_width for _ in range(self.grid_height)]
+            with open(self.filename, "rb") as file:
+                self.tiles = pickle.load(file)
+                self.grid_width = len(self.tiles[0])
+                self.grid_height = len(self.tiles)
                 for y in range(self.grid_height):
                     for x in range(self.grid_width):
-                        tile = Editor.tile_codes.index(lines[y][x]) - 2
-                        self.tiles[y][x] = Editor.WALL_TILE_INDEX if tile == -2 else tile
+                        tile = self.tiles[y][x] - 1
+                        self.tiles[y][x] = Editor.WALL_TILE_INDEX if tile == 8 else tile
         except:
             pass
 
