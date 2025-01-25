@@ -35,5 +35,5 @@ class Credits:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.quit = self.main.quit = True
-            elif event.type == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONUP:
                 self.quit = True

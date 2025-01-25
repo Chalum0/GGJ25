@@ -11,6 +11,7 @@ class MainMenu:
         self.button_font = pygame.font.SysFont("Liberation Sans", 40)
 
         self.buttons = [(.43, "Play"), (.63, "Credits"), (.83, "Quit")]
+        self.button_height = self.main.screen_size[1] * .15
         self.cursor = 0
 
 
@@ -38,9 +39,8 @@ class MainMenu:
 
         for index, (button_y, label) in enumerate(self.buttons):
             if index == self.cursor:
-                height = self.main.screen_size[1] * .15
                 y = self.main.screen_size[1] * button_y
-                rect = (0, y - height / 2, self.main.screen_size[0], height)
+                rect = (0, y - self.button_height / 2, self.main.screen_size[0], self.button_height)
                 pygame.draw.rect(screen, (0, 128, 0), rect)
             self.draw_centered_text(self.button_font, label, button_y)
 
@@ -64,4 +64,14 @@ class MainMenu:
                 elif event.key == pygame.K_DOWN:
                     self.cursor = (self.cursor + 1) % len(self.buttons)
                 elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                    self.press_button()
+            elif event.type == pygame.MOUSEMOTION:
+                self.cursor = -1
+                for index, (button_y, _) in enumerate(self.buttons):
+                    _, mouse_y = event.pos
+                    button_y *= self.main.screen_size[1]
+                    if button_y - self.button_height / 2 <= mouse_y < button_y + self.button_height / 2:
+                        self.cursor = index
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
                     self.press_button()
