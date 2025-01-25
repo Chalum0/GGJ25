@@ -4,6 +4,7 @@ import pygame
 class Player(GameObj):
 
     def __init__(self):
+        super().__init__()
         self.pos = [0, 0]
         self.texture = None
 
@@ -23,13 +24,6 @@ class Player(GameObj):
 
         self.rect = None
 
-        self.load_texture()
-        GameObj.__init__(self)
+        self.load_texture('./src/textures/player.png')
 
-    def load_texture(self):
-        self.texture = pygame.image.load('./src/textures/player.png')
-        self.texture = pygame.transform.scale(self.texture, (20, 20))
-        self.rect = self.texture.get_rect()
 
-    def update_rect(self):
-        self.rect.topleft = self.pos

@@ -8,9 +8,9 @@ class Bubble(GameObj):
     GREEN = 2
 
     def __init__(self, type):
-        GameObj.__init__(self)
+        super().__init__()
         self.type = type
 
-    def load_texture(self):
+    def load_texture(self, **kwargs):
         name = ['blue', 'red', 'green'][self.type]
-        self.texture = pygame.image.load('./src/textures/bubble-{}.png'.format(name))
+        self.texture = pygame.image.load(f'./src/textures/bubble-{name}.png')
