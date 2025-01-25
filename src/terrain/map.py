@@ -35,7 +35,7 @@ class Map:
         22: "wall-bottomleftright",
         23: "wall-topbottomleftright",
     }
-    TRANSPARENT_BLOCKS = [1, 5, 6, 7, 8, 9]
+    TRANSPARENT_BLOCKS = [1, 2, 5, 6, 7, 8]
     HIDDEN_BLOCKS = [1]
     INTERACTION_BLOCKS = [5, 6, 7]
 
