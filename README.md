@@ -1,18 +1,18 @@
 # GGJ25
 
-## This is the project made for the 2025 global game jam on the theme "bubbles".
+This is a project made for the [Global Game Jam](https://globalgamejam.org/) 2025 on the theme “bubbles”.
 
----
+## Installation
 
-### Installation:
+Clone the project, open a terminal in its directory and enter the following commands.
 
-Clone the project and open a terminal in that path and enter the following commands.
+```
+python -m venv .venv
 
-``python -m venv .venv``
+".venv/scripts/activate" # Windows
+source .venv/bin/activate # Unix
 
-``".venv/scripts/activate" (windows)``
-``source .venv/bin/activate (linux)``
+pip install -r requirements.txt
 
-``pip install -r requirements.txt``
-
-``main.py``
+python main.py
+```
