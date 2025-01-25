@@ -15,9 +15,9 @@ class GameObj:
         self.y_momentum = 0
 
 
-    def load_texture(self, path):
-        self.texture = pygame.image.load('./src/textures/player.png')
-        self.texture = pygame.transform.scale(self.texture, (20, 20))
+    def load_texture(self, path, size=(20, 20)):
+        self.texture = pygame.image.load(path).convert_alpha()
+        self.texture = pygame.transform.scale(self.texture, size)
         self.rect = self.texture.get_rect()
 
     def update_rect(self):
