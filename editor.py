@@ -85,10 +85,10 @@ class Editor:
 
     def render(self):
         screen = self.screen
-        screen.fill((128, 128, 128))
+        screen.fill((64, 64, 64))
         end_x = self.grid_width * self.tile_width - self.scroll_x
         end_y = self.grid_height * self.tile_height - self.scroll_y
-        pygame.draw.rect(screen, (128, 128, 255), (0, 0, end_x, end_y))
+        pygame.draw.rect(screen, (0, 0, 128), (0, 0, end_x, end_y))
 
         for y in range(self.grid_height):
             for x in range(self.grid_width):
