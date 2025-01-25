@@ -29,5 +29,4 @@ class Map:
 
     def load_textures(self):
         for i in range(self.tiles_amount):
-            self.tiles_texture.append(pygame.image.load(f'src/textures/{i+1}.png'))
-
+            self.tiles_texture.append(pygame.image.load(f'src/textures/{i+1}.png').convert_alpha())

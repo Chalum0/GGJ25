@@ -11,4 +11,4 @@ class Bubble(GameObj):
         super().__init__()
         self.type = type
         name = ['red', 'green', 'blue'][self.type]
-        self.texture = pygame.image.load(f'./src/textures/bubble-{name}.png')
+        self.texture = pygame.image.load(f'./src/textures/bubble-{name}.png').convert_alpha()

@@ -3,7 +3,6 @@ from src.settings.settings import *
 from src.terrain.map import Map
 
 import pygame
-import random
 import time
 import math
 

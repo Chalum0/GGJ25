@@ -2,7 +2,6 @@
 
 import pygame
 import pickle
-from queue import Queue
 
 
 class Editor:
@@ -147,22 +146,14 @@ class Editor:
 
     def mark_reachable(self):
         reachable = [[False] * self.grid_width for _ in range(self.grid_height)]
-        queue = Queue()
         for y in range(self.grid_height):
             for x in range(self.grid_width):
-                if self.tiles[y][x] == Editor.PLAYER_TILE_INDEX:
-                    reachable[y][x] = True
-                    queue.put((x, y))
-        while not queue.empty():
-            x, y = queue.get()
-            for dx, dy in ((-1, 0), (0, -1), (1, 0), (0, 1)):
-                x2 = x + dx
-                y2 = y + dy
-                if 0 <= x2 < self.grid_width and 0 <= y2 < self.grid_height \
-                        and not reachable[y2][x2]:
-                    reachable[y2][x2] = True
-                    if self.tiles[y2][x2] < 0:
-                        queue.put((x2, y2))
+                for dx, dy in ((-1, 0), (0, -1), (1, 0), (0, 1)):
+                    x2 = x + dx
+                    y2 = y + dy
+                    if x2 < 0 or self.grid_width <= x2 or y2 < 0 or self.grid_height <= y2 \
+                            or self.tiles[y][x] != Editor.WALL_TILE_INDEX:
+                        reachable[y][x] = True
         return reachable
 
     def save(self):
@@ -170,7 +161,7 @@ class Editor:
         with open(self.filename, "wb") as file:
             tiles = [
                 [
-                    -2 if self.tiles[y][x] == Editor.WALL_TILE_INDEX and not reachable[y][x] else self.tiles[y][x] + 1
+                    (8 if self.tiles[y][x] == Editor.WALL_TILE_INDEX and not reachable[y][x] else self.tiles[y][x]) + 1
                     for x in range(self.grid_width)
                 ]
                 for y in range(self.grid_height)
