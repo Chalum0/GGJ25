@@ -10,6 +10,11 @@ class MainMenu:
         self.title_font = pygame.font.SysFont("Liberation Sans", 60)
         self.button_font = pygame.font.SysFont("Liberation Sans", 40)
 
+        self.crab = pygame.image.load('src/textures/crab.png')
+        self.crab = pygame.transform.scale_by(self.crab, 2)
+        self.bubbles = [pygame.image.load(f'src/textures/bubble-{name}.png') for name in ('red', 'green')]
+        self.bubbles = [pygame.transform.scale(bubble, (50, 50)) for bubble in self.bubbles]
+
         self.buttons = [(.43, "Play"), (.63, "Credits"), (.83, "Quit")]
         self.button_height = self.main.screen_size[1] * .15
         self.cursor = 0
@@ -35,6 +40,10 @@ class MainMenu:
         screen = self.main.screen
         screen.fill((0, 0, 255))
 
+        for bubble, bubble_x in zip(self.bubbles, (.15, .85)):
+            bubble_x = self.main.screen_size[0] * bubble_x - bubble.get_width() / 2
+            bubble_y = self.main.screen_size[1] * .2 - bubble.get_height() / 2
+            screen.blit(bubble, (bubble_x, bubble_y))
         self.draw_centered_text(self.title_font, "Bubble Passage", .2)
 
         for index, (button_y, label) in enumerate(self.buttons):
@@ -42,6 +51,11 @@ class MainMenu:
                 y = self.main.screen_size[1] * button_y
                 rect = (0, y - self.button_height / 2, self.main.screen_size[0], self.button_height)
                 pygame.draw.rect(screen, (0, 128, 0), rect)
+                crab_x = self.main.screen_size[0] * .25 - self.crab.get_width() / 2
+                crab_y = y - self.crab.get_height() / 2
+                screen.blit(self.crab, (crab_x, crab_y))
+                crab_x = self.main.screen_size[0] * .75 - self.crab.get_width() / 2
+                screen.blit(self.crab, (crab_x, crab_y))
             self.draw_centered_text(self.button_font, label, button_y)
 
 
