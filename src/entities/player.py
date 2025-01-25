@@ -1,6 +1,7 @@
+from src.entities.gameobj import GameObj
 import pygame
 
-class Player:
+class Player(GameObj):
 
     def __init__(self):
         self.pos = [0, 0]
@@ -23,6 +24,7 @@ class Player:
         self.rect = None
 
         self.load_texture()
+        GameObj.__init__(self)
 
     def load_texture(self):
         self.texture = pygame.image.load('./src/textures/player.png')
