@@ -15,6 +15,7 @@ class Editor:
         pygame.init()
         pygame.display.set_caption("Bubble Passage Editor")
         self.screen = pygame.display.set_mode((1080, 720))
+        pygame.display.set_icon(pygame.image.load('src/textures/crab.png'))
         self.clock = pygame.time.Clock()
         self.max_fps = 60
 
@@ -39,11 +40,13 @@ class Editor:
 
 
     def load_textures(self):
-        self.textures = []
-        for name in ['crab', 'wall', 'urchin', 'urchin', 'bubble-red', 'bubble-green', 'bubble-blue', 'checkpoint']:
+        filenames = ['crab', 'wall', 'urchin', 'urchin', 'bubble-red', 'bubble-green', 'bubble-blue', 'checkpoint']
+        self.textures = [None] * len(filenames)
+        for index, name in enumerate(filenames):
             texture = pygame.image.load(f'src/textures/{name}.png').convert_alpha()
-            texture = pygame.transform.scale(texture, (self.tile_width, self.tile_height))
-            self.textures.append(texture)
+            texture_height = self.tile_height // 2 if name == 'crab' else self.tile_height
+            texture = pygame.transform.scale(texture, (self.tile_width, texture_height))
+            self.textures[index] = texture
         directions = ['top', 'bottom', 'left', 'right']
         self.wall_textures = [None] * (2 ** len(directions))
         for index in range(2 ** len(directions)):

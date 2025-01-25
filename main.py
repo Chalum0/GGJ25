@@ -8,6 +8,7 @@ class Main:
         pygame.display.set_caption("Bubble Passage")
         self.screen_size = (1080, 720)
         self.screen = pygame.display.set_mode(self.screen_size)
+        pygame.display.set_icon(pygame.image.load('src/textures/crab.png'))
         self.clock = pygame.time.Clock()
         self.max_fps = 120
 
