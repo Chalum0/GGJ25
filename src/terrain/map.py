@@ -28,7 +28,7 @@ class Map:
     def __init__(self, screen_size):
         self.tile_size = 40
         self.grid = None
-        self.load_map(1)
+        self.load_map(2)
         print(len(self.grid))
         self.min_offset_x = 0
         self.max_offset_x = - len(self.grid[0]) * self.tile_size + screen_size[0]

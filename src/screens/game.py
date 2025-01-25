@@ -120,11 +120,23 @@ class Game:
                         player.x_momentum = 0
                         player.bubble_pos = p
 
+                    if t == self.map.INTERACTION_TILES_ID["green-bubble"]:
+                        player.bubble_pos = p
+                        player.x_momentum = -player.x_momentum * 2
+                        player.y_momentum = -min(player.y_momentum * 1.3, player.max_y_momentum/1.2)
+                        x, y = self.player.bubble_pos
+                        self.map.grid[y][x] = 0
+
         else:
             player.pos = previous_player_pos
             self.controls_in_bubble(keys)
 
+        self.control_any(keys)
         player.update_rect()
+
+    def control_any(self, keys):
+        if keys[control_keys["RESET"]]:
+            self.playing = False
 
     def controls(self, keys, dt):
         # move player according to controls
@@ -168,11 +180,11 @@ class Game:
             self.player.pos[0] += self.player.x_momentum
 
         if keys[control_keys["UP"]] and keys[control_keys["JUMP"]]:
-            self.player.y_momentum = -10
+            self.player.y_momentum = -7
             self.player.pos[1] += self.player.y_momentum
 
         if keys[control_keys["DOWN"]] and keys[control_keys["JUMP"]]:
-            self.player.y_momentum = 20
+            self.player.y_momentum = 10
             self.player.pos[1] += self.player.y_momentum
 
         if (keys[control_keys["RIGHT"]] or keys[control_keys["LEFT"]] or keys[control_keys["UP"]] or keys[control_keys["DOWN"]]) and keys[control_keys["JUMP"]]:

@@ -6,4 +6,5 @@ control_keys = {
     "JUMP": pygame.K_SPACE,
     "UP": pygame.K_z,
     "DOWN": pygame.K_s,
+    "RESET": pygame.K_r,
 }
