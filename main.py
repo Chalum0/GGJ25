@@ -45,11 +45,19 @@ class Main:
         self.map.tiles_rect = []
         for y in range(len(grid)):
             for x in range(len(grid[y])):
-                if grid[y][x] != 0:
-                    rect = pygame.rect.Rect(0, 0, self.map.tile_size, self.map.tile_size)
-                    rect.topleft = (self.map.current_offset_x + x * self.map.tile_size, self.map.current_offset_y + y * self.map.tile_size)
-                    self.map.tiles_rect.append(rect)
-                    screen.blit(self.map.tiles_texture[grid[y][x]-1], (self.map.current_offset_x + x*self.map.tile_size, self.map.current_offset_y + y*self.map.tile_size))
+                block = grid[y][x]
+                if block != 0:
+
+                    # display
+                    if block not in self.map.HIDDEN_BLOCKS:
+                        screen.blit(self.map.tiles_texture[block - 1], (self.map.current_offset_x + x * self.map.tile_size, self.map.current_offset_y + y * self.map.tile_size))
+
+                    # add collision
+                    if block not in self.map.TRANSPARENT_BLOCKS:
+                        rect = pygame.rect.Rect(0, 0, self.map.tile_size, self.map.tile_size)
+                        rect.topleft = (self.map.current_offset_x + x * self.map.tile_size, self.map.current_offset_y + y * self.map.tile_size)
+                        self.map.tiles_rect.append(rect)
+
 
         screen.blit(self.player.texture, self.player.rect)
 
