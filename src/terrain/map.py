@@ -12,14 +12,14 @@ class Map:
 
     TEXTURES = {
         1: "bubble-green",  # stating_point
-        2: "full-wall",  # wall with collisions
+        2: "wall",  # wall with collisions
         3: "urchin",  # damages
         4: "urchin",  # damages
         5: "bubble-red",  # red bubbles
         6: "bubble-green",  # green bubbles
         7: "bubble-blue",  # blue bubbles
         8: "checkpoint",  # checkpoint
-        9: "1"  # wall without collisions
+        9: "wall"  # wall without collisions
     }
     TRANSPARENT_BLOCKS = [1, 5, 6, 7, 8, 9]
     HIDDEN_BLOCKS = [1]
@@ -56,4 +56,3 @@ class Map:
     def load_textures(self):
         for i in range(self.tiles_amount):
             self.tiles_texture.append(pygame.transform.scale(pygame.image.load(f'src/textures/{self.TEXTURES[i+1]}.png').convert_alpha(), (self.tile_size, self.tile_size)))
-
