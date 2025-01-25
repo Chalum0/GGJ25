@@ -23,4 +23,7 @@ class Player(GameObj):
 
         self.rect = None
 
-        self.load_texture('./src/textures/crab_idle.png', (20, 10))
+        self.in_bubble = False
+        self.bubble_pos = None
+
+        self.load_texture('./src/textures/crab_idle.png', (40, 20))

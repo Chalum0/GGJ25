@@ -4,6 +4,12 @@ import pickle
 
 class Map:
 
+    INTERACTION_TILES_ID = {
+        "green-bubble": 6,
+        "red-bubble": 5,
+        "blue-bubble": 7,
+    }
+
     TEXTURES = {
         1: "bubble-green",  # stating_point
         2: "full-wall",  # wall with collisions
@@ -17,6 +23,7 @@ class Map:
     }
     TRANSPARENT_BLOCKS = [1, 5, 6, 7, 8, 9]
     HIDDEN_BLOCKS = [1]
+    INTERACTION_BLOCKS = [5, 6, 7]
 
     def __init__(self, screen_size):
         self.tile_size = 40
@@ -33,6 +40,7 @@ class Map:
         self.tiles_amount = len(self.TEXTURES)
 
         self.tiles_rect = []
+        self.interaction_tiles_rect = []
 
         self.load_textures()
 
