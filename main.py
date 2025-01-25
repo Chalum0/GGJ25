@@ -40,7 +40,7 @@ class Main:
     def render(self):
         screen = self.screen
         grid = self.map.grid
-        screen.fill((255, 0, 0))
+        screen.fill((0,0,128))
 
         self.map.tiles_rect = []
         for y in range(len(grid)):

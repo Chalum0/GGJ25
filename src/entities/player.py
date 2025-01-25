@@ -23,4 +23,4 @@ class Player(GameObj):
 
         self.rect = None
 
-        self.load_texture('./src/textures/player.png')
+        self.load_texture('./src/textures/crab_idle.png', (20, 10))
