@@ -5,16 +5,18 @@ import pickle
 class Map:
 
     TEXTURES = {
-        1: "1",
-        2: "full-wall",
-        3: "urchin",
-        4: "urchin",
-        5: "bubble-red",
-        6: "bubble-green",
-        7: "bubble-blue",
-        8: "checkpoint",
-        9: "1"
+        1: "bubble-green",  # stating_point
+        2: "full-wall",  # wall with collisions
+        3: "urchin",  # damages
+        4: "urchin",  # damages
+        5: "bubble-red",  # red bubbles
+        6: "bubble-green",  # green bubbles
+        7: "bubble-blue",  # blue bubbles
+        8: "checkpoint",  # checkpoint
+        9: "1"  # wall without collisions
     }
+    TRANSPARENT_BLOCKS = [1, 5, 6, 7, 8, 9]
+    HIDDEN_BLOCKS = [1]
 
     def __init__(self, screen_size):
         self.tile_size = 40

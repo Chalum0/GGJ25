@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+from src.entities.player import Player
+from src.settings.settings import *
+from src.terrain.map import Map
 
 from src.screens.game import Game
 import pygame
