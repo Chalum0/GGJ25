@@ -152,7 +152,7 @@ class Editor:
                     x2 = x + dx
                     y2 = y + dy
                     if x2 < 0 or self.grid_width <= x2 or y2 < 0 or self.grid_height <= y2 \
-                            or self.tiles[y][x] != Editor.WALL_TILE_INDEX:
+                            or self.tiles[y2][x2] != Editor.WALL_TILE_INDEX:
                         reachable[y][x] = True
         return reachable
 
