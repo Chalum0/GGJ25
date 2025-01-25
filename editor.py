@@ -7,6 +7,7 @@ from queue import Queue
 class Editor:
 
     PLAYER_TILE_INDEX = 0
+    WALL_TILE_INDEX = 1
 
     def __init__(self, filename):
         self.filename = filename
@@ -28,7 +29,7 @@ class Editor:
 
         self.tiles = [[-1] * self.grid_width for _ in range(self.grid_height)]
         self.tiles[1][1] = 0
-        self.current_tile = 1
+        self.current_tile = Editor.WALL_TILE_INDEX
 
         self.load()
 
@@ -36,7 +37,7 @@ class Editor:
 
 
     def load_textures(self):
-        filenames = ['player', 'wall', 'hurt-down']
+        filenames = ['player', 'wall', 'hurt-down', 'bubble-red', 'bubble-green', 'bubble-blue']
         self.textures = [
             pygame.image.load('src/textures/{}.png'.format(name)).convert_alpha()
             for name in filenames
@@ -143,7 +144,7 @@ class Editor:
                     self.tiles[y][x] = -1
 
 
-    tile_codes = ['-', ' ', 'P', 'W', '^']
+    tile_codes = ['-', ' ', 'P', 'W', '^', 'R', 'G', 'B']
 
     def mark_reachable(self):
         reachable = [[False] * self.grid_width for _ in range(self.grid_height)]
@@ -171,7 +172,7 @@ class Editor:
             for y in range(self.grid_height):
                 for x in range(self.grid_width):
                     tile = self.tiles[y][x]
-                    if tile == 1 and not reachable[y][x]:
+                    if tile == Editor.WALL_TILE_INDEX and not reachable[y][x]:
                         tile = -2
                     file.write(Editor.tile_codes[tile + 2])
                 file.write('\n')
@@ -186,7 +187,7 @@ class Editor:
                 for y in range(self.grid_height):
                     for x in range(self.grid_width):
                         tile = Editor.tile_codes.index(lines[y][x]) - 2
-                        self.tiles[y][x] = 1 if tile == -2 else tile
+                        self.tiles[y][x] = Editor.WALL_TILE_INDEX if tile == -2 else tile
         except:
             pass
 
