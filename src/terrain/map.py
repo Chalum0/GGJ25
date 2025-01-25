@@ -12,14 +12,28 @@ class Map:
 
     TEXTURES = {
         1: "bubble-green",  # stating_point
-        2: "wall",  # wall with collisions
+        2: "wall",  # wall without collisions
         3: "urchin",  # damages
         4: "urchin",  # damages
         5: "bubble-red",  # red bubbles
         6: "bubble-green",  # green bubbles
         7: "bubble-blue",  # blue bubbles
         8: "checkpoint",  # checkpoint
-        9: "wall"  # wall without collisions
+        9: "wall-top",
+        10: "wall-bottom",
+        11: "wall-topbottom",
+        12: "wall-left",
+        13: "wall-topleft",
+        14: "wall-bottomleft",
+        15: "wall-topbottomleft",
+        16: "wall-right",
+        17: "wall-topright",
+        18: "wall-bottomright",
+        19: "wall-topbottomright",
+        20: "wall-leftright",
+        21: "wall-topleftright",
+        22: "wall-bottomleftright",
+        23: "wall-topbottomleftright",
     }
     TRANSPARENT_BLOCKS = [1, 5, 6, 7, 8, 9]
     HIDDEN_BLOCKS = [1]

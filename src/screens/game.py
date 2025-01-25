@@ -237,3 +237,4 @@ class Game:
             if event.type == pygame.QUIT:
                 time.sleep(0.5)
                 self.playing = False
+                pygame.quit()
