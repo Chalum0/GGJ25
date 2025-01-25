@@ -16,7 +16,7 @@ class GameObj:
 
 
     def load_texture(self, path):
-        self.texture = pygame.image.load('./src/textures/player.png')
+        self.texture = pygame.image.load(path)
         self.texture = pygame.transform.scale(self.texture, (20, 20))
         self.rect = self.texture.get_rect()
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import pygame
+import pickle
 from queue import Queue
 
 
@@ -8,9 +9,6 @@ class Editor:
 
     PLAYER_TILE_INDEX = 0
     WALL_TILE_INDEX = 1
-
-    # The first 2 tile codes are special, the others are in the same order as “filenames” below
-    tile_codes = ['-', ' ', 'P', 'W', '^', 'v', 'R', 'G', 'B', 'C']
 
     def __init__(self, filename):
         self.filename = filename
@@ -169,26 +167,26 @@ class Editor:
 
     def save(self):
         reachable = self.mark_reachable()
-        with open(self.filename, "w") as file:
-            for y in range(self.grid_height):
-                for x in range(self.grid_width):
-                    tile = self.tiles[y][x]
-                    if tile == Editor.WALL_TILE_INDEX and not reachable[y][x]:
-                        tile = -2
-                    file.write(Editor.tile_codes[tile + 2])
-                file.write('\n')
+        with open(self.filename, "wb") as file:
+            tiles = [
+                [
+                    -2 if self.tiles[y][x] == Editor.WALL_TILE_INDEX and not reachable[y][x] else self.tiles[y][x] + 1
+                    for x in range(self.grid_width)
+                ]
+                for y in range(self.grid_height)
+            ]
+            pickle.dump(tiles, file)
 
     def load(self):
         try:
-            with open(self.filename, "r") as file:
-                lines = file.readlines()
-                self.grid_width = len(lines[0]) - 1
-                self.grid_height = len(lines)
-                self.tiles = [[-1] * self.grid_width for _ in range(self.grid_height)]
+            with open(self.filename, "rb") as file:
+                self.tiles = pickle.load(file)
+                self.grid_width = len(self.tiles[0])
+                self.grid_height = len(self.tiles)
                 for y in range(self.grid_height):
                     for x in range(self.grid_width):
-                        tile = Editor.tile_codes.index(lines[y][x]) - 2
-                        self.tiles[y][x] = Editor.WALL_TILE_INDEX if tile == -2 else tile
+                        tile = self.tiles[y][x] - 1
+                        self.tiles[y][x] = Editor.WALL_TILE_INDEX if tile == 8 else tile
         except:
             pass
 

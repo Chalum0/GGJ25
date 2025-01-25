@@ -10,7 +10,6 @@ import math
 
 class Main:
     def __init__(self):
-        # -- Window creation --
         pygame.init()
         pygame.display.set_caption("hello world!")
         self.screen_size = (1080, 720)

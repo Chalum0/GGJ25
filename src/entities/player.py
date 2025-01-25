@@ -1,5 +1,4 @@
 from src.entities.gameobj import GameObj
-import pygame
 
 class Player(GameObj):
 
@@ -25,5 +24,3 @@ class Player(GameObj):
         self.rect = None
 
         self.load_texture('./src/textures/player.png')
-
-
