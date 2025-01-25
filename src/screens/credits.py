@@ -27,7 +27,7 @@ class Credits:
 
         self.draw_centered_text(self.font, "Game created by:", .29)
         self.draw_centered_text(self.font, "Snappyink", .43)
-        self.draw_centered_text(self.font, "Gabriel Etienne", .57)
+        self.draw_centered_text(self.font, "Gabibel", .57)
         self.draw_centered_text(self.font, "Sylvain Chiron", .71)
 
 
