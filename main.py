@@ -106,9 +106,6 @@ class Main:
 
         player.update_rect()
 
-
-
-
     def controls(self, keys, dt):
         # move player according to controls
         if keys[control_keys["LEFT"]] and self.player.x_momentum > -self.player.max_x_momentum:
