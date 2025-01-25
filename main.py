@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from src.screens.game import Game
 import pygame
 
@@ -11,6 +13,7 @@ class Main:
         self.clock = pygame.time.Clock()
         self.max_fps = 120
 
+        self.quit = False
         Game(self).loop()
 
 
