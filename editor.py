@@ -37,7 +37,7 @@ class Editor:
 
 
     def load_textures(self):
-        filenames = ['player', 'wall', 'hurt-down', 'hurt-up', 'bubble-red', 'bubble-green', 'bubble-blue', 'checkpoint']
+        filenames = ['crab_idle', 'wall', 'urchin', 'urchin', 'bubble-red', 'bubble-green', 'bubble-blue', 'checkpoint']
         self.textures = [
             pygame.image.load('src/textures/{}.png'.format(name)).convert_alpha()
             for name in filenames

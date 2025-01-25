@@ -1,8 +1,4 @@
-from src.entities.player import Player
-from src.settings.settings import *
-from src.terrain.map import Map
-
-from src.screens.game import Game
+from src.screens.mainmenu import MainMenu
 import pygame
 
 
@@ -16,7 +12,7 @@ class Main:
         self.max_fps = 120
 
         self.quit = False
-        Game(self).loop()
+        MainMenu(self).loop()
 
 
 if __name__ == "__main__":
