@@ -324,6 +324,7 @@ class Game:
             self.player.on_falling_bubble = False
             self.player.collide_bottom = False
             self.player.y_momentum = self.player.jump_power
+            self.player.jumping = True
 
     def controls_in_bubble(self, keys):
         if keys[control_keys["RIGHT"]] and keys[control_keys["JUMP"]]:
@@ -372,6 +373,8 @@ class Game:
                 obj.pos[1] = tile.top - obj.rect.size[1]
                 obj.collide_bottom = True
                 obj.y_momentum = 0
+                if obj == self.player:
+                    self.player.jumping = False
             tls.append(tile)
 
         # collisions x

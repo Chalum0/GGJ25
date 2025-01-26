@@ -39,11 +39,17 @@ class Player(GameObj):
         self.bubble_color = 1  # 1: blue, 2: red, 3: green
 
         self.death_time = None
+        self.jumping = False
 
         crab_size = (40, 20)
         self.load_texture('./src/textures/crab-idle.png', crab_size)
         self.death_textures = [pygame.image.load(f'./src/textures/crab-dies{i}.png').convert_alpha() for i in range(1, 4)]
         self.death_textures = [pygame.transform.scale(img, crab_size) for img in self.death_textures]
+        self.jump_textures = [
+            pygame.image.load(f'./src/textures/crab-{action}.png').convert_alpha()
+            for action in ('jumping', 'gliding', 'falling')
+        ]
+        self.jump_textures = [pygame.transform.scale(img, crab_size) for img in self.jump_textures]
 
     def toggle_bubble_mod(self, mp):
         if not self.bubble_mod:
@@ -76,6 +82,14 @@ class Player(GameObj):
 
     def draw(self, screen):
         texture = self.texture
-        if self.death_time != None:
-            texture = self.death_textures[int(self.death_time / (self.DYING_TIME / len(self.death_textures)))]
+        if not self.bubble_mod:
+            if self.death_time != None:
+                texture = self.death_textures[int(self.death_time / (self.DYING_TIME / len(self.death_textures)))]
+            elif self.jumping:
+                if self.y_momentum < -2:
+                    texture = self.jump_textures[0]
+                elif self.y_momentum > 2:
+                    texture = self.jump_textures[2]
+                else:
+                    texture = self.jump_textures[1]
         screen.blit(texture, self.rect)
