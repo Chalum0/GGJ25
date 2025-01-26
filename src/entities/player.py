@@ -25,5 +25,46 @@ class Player(GameObj):
 
         self.in_bubble = False
         self.bubble_pos = None
+        self.before_bubble_offset_x = None
+        self.before_bubble_offset_y = None
+        self.bubble_element = None
 
-        self.load_texture('./src/textures/crab_idle.png', (40, 20))
+        self.max_placed_bubbles = 3
+
+        self.bubble_mod = False
+        self.before_bubble_pos = None
+        self.bubble_color = 1  # 1: blue, 2: red, 3: green
+
+        self.load_texture('./src/textures/crab-idle.png', (40, 20))
+
+    def toggle_bubble_mod(self, mp):
+        self.bubble_mod = not self.bubble_mod
+        if self.bubble_mod:
+            self.before_bubble_offset_x = mp.current_offset_x
+            self.before_bubble_offset_y = mp.current_offset_y
+            self.before_bubble_pos = [self.pos[0], self.pos[1]]
+            match self.bubble_color:
+                case 1:
+                    self.load_texture('./src/textures/white_bubble_blue_idle1.png', (32, 32))
+                case 2:
+                    self.load_texture('./src/textures/white_bubble_red_idle1.png', (32, 32))
+                case 3:
+                    self.load_texture('./src/textures/white_bubble_green_idle1.png', (32, 32))
+        else:
+            mp.current_offset_x = self.before_bubble_offset_x
+            mp.current_offset_y = self.before_bubble_offset_y
+            self.pos[0] = self.before_bubble_pos[0]
+            self.pos[1] = self.before_bubble_pos[1]
+            self.update_rect()
+            self.load_texture('./src/textures/crab-idle.png', (40, 20))
+
+    def change_buble_color(self, color):
+        self.bubble_color = color
+        if self.bubble_mod:
+            match self.bubble_color:
+                case 1:
+                    self.load_texture('./src/textures/white_bubble_blue_idle1.png', (32, 32))
+                case 2:
+                    self.load_texture('./src/textures/white_bubble_red_idle1.png', (32, 32))
+                case 3:
+                    self.load_texture('./src/textures/white_bubble_green_idle1.png', (32, 32))

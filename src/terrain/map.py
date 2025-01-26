@@ -35,15 +35,15 @@ class Map:
         22: "wall-bottomleftright",
         23: "wall-topbottomleftright",
     }
-    TRANSPARENT_BLOCKS = [1, 2, 5, 6, 7, 8]
-    HIDDEN_BLOCKS = [1]
-    INTERACTION_BLOCKS = [5, 6, 7]
+    TRANSPARENT_TILES = [1, 2, 3, 4, 5, 6, 7, 8]
+    HIDDEN_TILES = [1]
+    INTERACTION_TILES = [5, 6, 7]
+    DEADLY_TILES = [3, 4]
 
     def __init__(self, screen_size):
         self.tile_size = 40
         self.grid = None
         self.load_map(2)
-        print(len(self.grid))
         self.min_offset_x = 0
         self.max_offset_x = - len(self.grid[0]) * self.tile_size + screen_size[0]
         self.min_offset_y = 0
@@ -55,6 +55,9 @@ class Map:
 
         self.tiles_rect = []
         self.interaction_tiles_rect = []
+        self.deadly_tiles_rect = []
+
+        self.placed_bubbles = []
 
         self.load_textures()
 

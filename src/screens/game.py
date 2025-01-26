@@ -1,4 +1,4 @@
-from src.entities import player
+from src.entities.bubble import Bubble
 from src.entities.player import Player
 from src.settings.settings import *
 from src.terrain.map import Map
@@ -38,23 +38,29 @@ class Game:
 
         self.map.tiles_rect = []
         self.map.interaction_tiles_rect = []
+        self.map.deadly_tiles_rect = []
         for y in range(len(grid)):
             for x in range(len(grid[y])):
                 block = grid[y][x]
                 if block != 0:
 
                     # display
-                    if block not in self.map.HIDDEN_BLOCKS:
+                    if block not in self.map.HIDDEN_TILES:
                         screen.blit(self.map.tiles_texture[block - 1], (self.map.current_offset_x + x * self.map.tile_size, self.map.current_offset_y + y * self.map.tile_size))
 
                     # add collision
                     rect = pygame.rect.Rect(0, 0, self.map.tile_size, self.map.tile_size)
                     rect.topleft = (self.map.current_offset_x + x * self.map.tile_size, self.map.current_offset_y + y * self.map.tile_size)
-                    if block not in self.map.TRANSPARENT_BLOCKS:
+                    if block not in self.map.TRANSPARENT_TILES:
                         self.map.tiles_rect.append(rect)
-                    if block in self.map.INTERACTION_BLOCKS:
+                    if block in self.map.INTERACTION_TILES:
                         self.map.interaction_tiles_rect.append({"type": block, "rect": rect, "pos": (x, y)})
 
+                    if block in self.map.DEADLY_TILES:
+                        self.map.deadly_tiles_rect.append(rect)
+
+        for bubble in self.map.placed_bubbles:
+            screen.blit(bubble.texture, [self.map.current_offset_x + bubble.pos[0], self.map.current_offset_y + bubble.pos[1]])
 
         screen.blit(self.player.texture, self.player.rect)
 
@@ -72,14 +78,14 @@ class Game:
             if player.rect.bottom >= screen_size[1] + player.rect.height and self.map.current_offset_y < self.map.max_offset_y:
                 self.playing = False
 
-            if not player.collide_bottom:
+            if not player.collide_bottom and not player.bubble_mod:
                 if player.y_momentum < player.max_y_momentum:
                     player.y_momentum = min(
                         player.y_momentum + player.y_acceleration * dt,
                         player.max_y_momentum
                     )
 
-            else:
+            elif not player.bubble_mod:
                 player.y_momentum = 0
 
 
@@ -113,7 +119,7 @@ class Game:
                 rect = tile["rect"]
                 t = tile["type"]
                 p = tile["pos"]
-                if player.rect.colliderect(rect):
+                if player.rect.colliderect(rect) and not player.bubble_mod:
                     if t == self.map.INTERACTION_TILES_ID["red-bubble"]:
                         player.pos = [rect.x, rect.y + player.rect.height/2]
                         player.in_bubble = True
@@ -127,6 +133,43 @@ class Game:
                         x, y = self.player.bubble_pos
                         self.map.grid[y][x] = 0
 
+                    if t == self.map.INTERACTION_TILES_ID["blue-bubble"]:
+                        player.bubble_pos = p
+                        player.x_momentum = -player.x_momentum * 2
+                        player.y_momentum = -min(player.y_momentum * 1.3, player.max_y_momentum / 1.2)
+                        x, y = self.player.bubble_pos
+                        self.map.grid[y][x] = 0
+
+            for tile in self.map.deadly_tiles_rect:
+                if player.rect.colliderect(tile) and not player.bubble_mod:
+                    self.__init__(self.main)
+
+            for bubble in self.map.placed_bubbles:
+                if player.rect.colliderect(bubble.rect):
+                    if player.bubble_mod and self.player.bubble_color == bubble.color:
+                        self.map.placed_bubbles.remove(bubble)
+
+                    elif not player.bubble_mod:
+                        if bubble.color == 2:
+                            player.pos = [bubble.rect.x, bubble.rect.y + player.rect.height / 2]
+                            player.in_bubble = True
+                            player.x_momentum = 0
+                            player.bubble_pos = bubble.pos
+                            self.player.bubble_element = bubble
+
+                        if bubble.color == 3:
+                            player.bubble_pos = bubble.pos
+                            player.x_momentum = -player.x_momentum * 2
+                            player.y_momentum = -min(player.y_momentum * 1.3, player.max_y_momentum / 1.2)
+                            self.map.placed_bubbles.remove(bubble)
+
+                        if bubble.color == 1:
+                            player.bubble_pos = bubble.pos
+                            player.x_momentum = -player.x_momentum * 2
+                            player.y_momentum = -min(player.y_momentum * 1.3, player.max_y_momentum / 1.2)
+                            self.map.placed_bubbles.remove(bubble)
+
+
         else:
             player.pos = previous_player_pos
             self.controls_in_bubble(keys)
@@ -137,6 +180,13 @@ class Game:
     def control_any(self, keys):
         if keys[control_keys["RESET"]]:
             self.playing = False
+
+        if keys[control_keys["SWITCH_BLUE"]]:
+            self.player.change_buble_color(1)
+        if keys[control_keys["SWITCH_RED"]]:
+            self.player.change_buble_color(2)
+        if keys[control_keys["SWITCH_GREEN"]]:
+            self.player.change_buble_color(3)
 
     def controls(self, keys, dt):
         # move player according to controls
@@ -154,6 +204,28 @@ class Game:
 
             if -0.5 < self.player.x_momentum < 0.5:
                 self.player.x_momentum = 0
+
+
+        # Bubble Mode
+        if self.player.bubble_mod:
+            if keys[control_keys["UP"]] and self.player.y_momentum > -self.player.max_x_momentum:
+                self.player.y_momentum -= self.player.x_acceleration * dt
+            if keys[control_keys["DOWN"]] and self.player.y_momentum < self.player.max_x_momentum:
+                self.player.y_momentum += self.player.x_acceleration * dt
+
+            if not keys[control_keys["UP"]] and not keys[control_keys["DOWN"]]:
+                if self.player.y_momentum > 0:
+                    self.player.y_momentum -= self.player.x_acceleration * dt
+                elif self.player.y_momentum < 0:
+                    self.player.y_momentum += self.player.x_acceleration * dt
+
+                if -0.5 < self.player.y_momentum < 0.5:
+                    self.player.y_momentum = 0
+
+
+
+
+
 
         # if player goes over the speed limit (exemple: dashes)
         if self.player.x_momentum > self.player.max_x_momentum + 2:
@@ -189,9 +261,15 @@ class Game:
 
         if (keys[control_keys["RIGHT"]] or keys[control_keys["LEFT"]] or keys[control_keys["UP"]] or keys[control_keys["DOWN"]]) and keys[control_keys["JUMP"]]:
             self.player.in_bubble = False
-            x, y = self.player.bubble_pos
-            self.map.grid[y][x] = 0
-
+            try:
+                x, y = self.player.bubble_pos
+                self.map.grid[y][x] = 0
+            except IndexError:
+                pass
+            try:
+                self.map.placed_bubbles.remove(self.player.bubble_element)
+            except ValueError:
+                pass
 
     def move_obj(self, obj, dt):
 
@@ -238,3 +316,16 @@ class Game:
                 time.sleep(0.5)
                 self.playing = False
                 pygame.quit()
+            elif event.type == pygame.KEYDOWN:
+                if (event.key == control_keys["BUBBLE"] and self.player.x_momentum == 0 and -0.5 < self.player.y_momentum < 0.5 and not self.player.in_bubble) or (event.key == control_keys["BUBBLE"] and self.player.bubble_mod):
+                    self.player.toggle_bubble_mod(self.map)
+
+                if not len(self.map.placed_bubbles) >= 3:
+                    if event.key == control_keys["SPAWN_BUBBLE_UP"] and self.player.bubble_mod:
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.centerx, self.player.rect.centery-50]))
+                    if event.key == control_keys["SPAWN_BUBBLE_DOWN"] and self.player.bubble_mod:
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.centerx, self.player.rect.centery+50]))
+                    if event.key == control_keys["SPAWN_BUBBLE_LEFT"] and self.player.bubble_mod:
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.centerx-50, self.player.rect.centery]))
+                    if event.key == control_keys["SPAWN_BUBBLE_RIGHT"] and self.player.bubble_mod:
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.centerx+50, self.player.rect.centery]))
