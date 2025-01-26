@@ -25,14 +25,29 @@ class Game:
             self.player = Player(player_pos)
             self.checkpoint_time = None
 
-        except: # Game loading failed
+        except: # Map loading failed
             Win(self.main)
             self.playing = False
 
 
+    def reset(self):
+        self.__init__(self.main, self.level_num)
+
+    def die(self):
+        if self.player.death_time == None:
+            self.player.death_time = 0
+            self.player.pos[1] = min(self.player.pos[1], self.main.screen_size[1] - 20)
+            self.player.update_rect()
+
+
     def loop(self):
         while self.playing:
-            self.calculations()
+            if self.player.death_time == None:
+                self.calculations()
+            else:
+                self.player.death_time += self.dt
+                if self.player.death_time > Player.DYING_TIME:
+                    self.reset()
 
             self.render()
             pygame.display.flip()
@@ -70,9 +85,6 @@ class Game:
 
         screen.fill((64, 64, 64))
         self.draw_vertical_gradient()
-        end_x = len(grid[0]) * self.map.tile_size - self.map.current_offset_x
-        end_y = len(grid) * self.map.tile_size - self.map.current_offset_y
-        # pygame.draw.rect(screen, (0, 0, 128), (0, 0, end_x, end_y))
 
         self.map.tiles_rect = []
         self.map.interaction_tiles_rect = []
@@ -82,7 +94,6 @@ class Game:
                 block = grid[y][x]
                 if block != 0:
                     # display
-                    
                     if block not in self.map.HIDDEN_TILES:
                         block_x = self.map.current_offset_x + x * self.map.tile_size
                         block_y = self.map.current_offset_y + y * self.map.tile_size
@@ -106,8 +117,8 @@ class Game:
 
         for bubble in self.map.placed_bubbles:
             screen.blit(bubble.texture, bubble.rect)
-            
-        screen.blit(self.player.texture, self.player.rect)
+
+        self.player.draw(screen)
 
         if self.checkpoint_time != None:
             black = pygame.Surface(self.main.screen_size)
@@ -125,7 +136,7 @@ class Game:
 
         if not player.in_bubble:
             if player.rect.top >= self.map.current_offset_y + screen_size[1]:
-                self.__init__(self.main, self.level_num)
+                self.die()
                 return
 
             if not player.collide_bottom and not player.bubble_mod:
@@ -196,7 +207,7 @@ class Game:
 
             for tile in self.map.deadly_tiles_rect:
                 if player.rect.colliderect(tile) and not player.bubble_mod:
-                    self.__init__(self.main, self.level_num)
+                    self.die()
 
             for bubble in self.map.placed_bubbles:
                 if player.rect.colliderect(bubble.rect):
@@ -255,11 +266,11 @@ class Game:
         pass
 
         if keys[control_keys["SWITCH_BLUE"]]:
-            self.player.change_buble_color(1)
+            self.player.change_bubble_color(1)
         if keys[control_keys["SWITCH_RED"]]:
-            self.player.change_buble_color(2)
+            self.player.change_bubble_color(2)
         if keys[control_keys["SWITCH_GREEN"]]:
-            self.player.change_buble_color(3)
+            self.player.change_bubble_color(3)
 
     def controls(self, keys, dt):
         # move player according to controls
@@ -392,10 +403,12 @@ class Game:
                 time.sleep(0.5)
                 self.playing = False
                 self.main.quit = True
-                
+
             elif event.type == pygame.KEYDOWN:
-                if event.key == control_keys["RESET"]:
-                    self.__init__(self.main, self.level_num)
+                self.keys[event.scancode] = True
+
+                if event.scancode == control_keys["RESET"]:
+                    self.reset()
                 elif event.key == pygame.K_ESCAPE:
                     self.playing = False
                     

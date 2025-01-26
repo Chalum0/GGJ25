@@ -1,6 +1,9 @@
 from src.entities.gameobj import GameObj
+import pygame
 
 class Player(GameObj):
+
+    DYING_TIME = 1.
 
     def __init__(self, pos):
         super().__init__()
@@ -35,7 +38,12 @@ class Player(GameObj):
         self.before_bubble_pos = None
         self.bubble_color = 1  # 1: blue, 2: red, 3: green
 
-        self.load_texture('./src/textures/crab-idle.png', (40, 20))
+        self.death_time = None
+
+        crab_size = (40, 20)
+        self.load_texture('./src/textures/crab-idle.png', crab_size)
+        self.death_textures = [pygame.image.load(f'./src/textures/crab-dies{i}.png').convert_alpha() for i in range(1, 4)]
+        self.death_textures = [pygame.transform.scale(img, crab_size) for img in self.death_textures]
 
     def toggle_bubble_mod(self, mp):
         if not self.bubble_mod:
@@ -43,13 +51,7 @@ class Player(GameObj):
             self.before_bubble_offset_y = mp.current_offset_y
             self.before_bubble_pos = [self.pos[0], self.pos[1]]
             self.pos[1] -= 12
-            match self.bubble_color:
-                case 1:
-                    self.load_texture('./src/textures/white_bubble_blue_idle1.png', (32, 32))
-                case 2:
-                    self.load_texture('./src/textures/white_bubble_red_idle1.png', (32, 32))
-                case 3:
-                    self.load_texture('./src/textures/white_bubble_green_idle1.png', (32, 32))
+            self.change_bubble_color(self.bubble_color)
         else:
             mp.current_offset_x = self.before_bubble_offset_x
             mp.current_offset_y = self.before_bubble_offset_y
@@ -61,13 +63,19 @@ class Player(GameObj):
 
         self.bubble_mod = not self.bubble_mod
 
-    def change_buble_color(self, color):
+    def change_bubble_color(self, color):
         self.bubble_color = color
         if self.bubble_mod:
             match self.bubble_color:
                 case 1:
-                    self.load_texture('./src/textures/white_bubble_blue_idle1.png', (32, 32))
+                    self.load_texture('./src/textures/bubble-white-blue.png', (32, 32))
                 case 2:
-                    self.load_texture('./src/textures/white_bubble_red_idle1.png', (32, 32))
+                    self.load_texture('./src/textures/bubble-white-red.png', (32, 32))
                 case 3:
-                    self.load_texture('./src/textures/white_bubble_green_idle1.png', (32, 32))
+                    self.load_texture('./src/textures/bubble-white-green.png', (32, 32))
+
+    def draw(self, screen):
+        texture = self.texture
+        if self.death_time != None:
+            texture = self.death_textures[int(self.death_time / (self.DYING_TIME / len(self.death_textures)))]
+        screen.blit(texture, self.rect)
