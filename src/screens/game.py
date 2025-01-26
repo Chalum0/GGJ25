@@ -18,6 +18,7 @@ class Game:
         self.playing = True
         self.dt = 0
         self.font = pygame.font.SysFont("Liberation Sans", 30)
+        self.keys = [False] * 500
 
         try:
             self.map = Map(str(level_num), self.main.screen_size)
@@ -150,7 +151,7 @@ class Game:
                 player.y_momentum = 0
 
 
-            self.controls(keys, dt)
+            self.controls(self.keys, dt)
 
             player.collide_bottom = False
 
@@ -257,14 +258,12 @@ class Game:
 
         else:
             player.pos = previous_player_pos
-            self.controls_in_bubble(keys)
+            self.controls_in_bubble(self.keys)
 
-        self.control_any(keys)
+        self.control_any(self.keys)
         player.update_rect()
 
     def control_any(self, keys):
-        pass
-
         if keys[control_keys["SWITCH_BLUE"]]:
             self.player.change_bubble_color(1)
         if keys[control_keys["SWITCH_RED"]]:
@@ -397,6 +396,11 @@ class Game:
             bound_on_right(tile.left)
         obj.update_rect()
 
+    def place_bubble(self, dx, dy):
+        x = self.player.rect.left - self.map.current_offset_x + dx
+        y = self.player.rect.top - self.map.current_offset_y + dy
+        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [x, y]))
+
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -412,18 +416,21 @@ class Game:
                 elif event.key == pygame.K_ESCAPE:
                     self.playing = False
                     
-                if (event.key == control_keys["BUBBLE"] and self.player.x_momentum == 0 and -0.5 < self.player.y_momentum < 0.5 and not self.player.in_bubble) or (event.key == control_keys["BUBBLE"] and self.player.bubble_mod):
+                if (event.scancode == control_keys["BUBBLE"] and self.player.x_momentum == 0 and -0.5 < self.player.y_momentum < 0.5 and not self.player.in_bubble) or (event.key == control_keys["BUBBLE"] and self.player.bubble_mod):
                     self.player.toggle_bubble_mod(self.map)
 
-                if not len(self.map.placed_bubbles) >= 3:
-                    if event.key == control_keys["SPAWN_BUBBLE_UP"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x, self.player.rect.top - self.map.current_offset_y - 60]))
-                    if event.key == control_keys["SPAWN_BUBBLE_DOWN"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x, self.player.rect.top - self.map.current_offset_y + 60]))
-                    if event.key == control_keys["SPAWN_BUBBLE_LEFT"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x - 60, self.player.rect.top - self.map.current_offset_y]))
-                    if event.key == control_keys["SPAWN_BUBBLE_RIGHT"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x + 60, self.player.rect.top - self.map.current_offset_y]))
+                if len(self.map.placed_bubbles) < 3 and self.player.bubble_mod:
+                    if event.scancode == control_keys["SPAWN_BUBBLE_UP"]:
+                        self.place_bubble(0, -60)
+                    if event.scancode == control_keys["SPAWN_BUBBLE_DOWN"]:
+                        self.place_bubble(0, 60)
+                    if event.scancode == control_keys["SPAWN_BUBBLE_LEFT"]:
+                        self.place_bubble(-60, 0)
+                    if event.scancode == control_keys["SPAWN_BUBBLE_RIGHT"]:
+                        self.place_bubble(60, 0)
+
+            elif event.type == pygame.KEYUP:
+                self.keys[event.scancode] = False
 
         if self.checkpoint_time != None and pygame.time.get_ticks() - self.checkpoint_time >= 2000:
             self.__init__(self.main, self.level_num + 1)
