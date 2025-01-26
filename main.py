@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from src.screens.mainmenu import MainMenu
 import pygame
 
@@ -12,9 +14,6 @@ class Main:
 
         self.clock = pygame.time.Clock()
         self.max_fps = 120
-
-        pygame.mixer.music.load('src/audio/menu_music.ogg')
-        pygame.mixer.music.play(-1)
 
         self.quit = False
         MainMenu(self).loop()
