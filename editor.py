@@ -43,7 +43,7 @@ class Editor:
 
 
     def load_textures(self):
-        filenames = ['crab', 'wall', 'urchin1', 'urchin2', 'bubble-red', 'bubble-green', 'bubble-blue', 'crabette1',
+        filenames = ['crab', 'wall', 'urchin1', 'urchin2', 'bubble-red1', 'bubble-green1', 'bubble-blue1', 'crabette1',
             'plant1', 'plant2', 'plant3', 'plant4', 'bigplant1', 'bigplant2']
         self.textures = [None] * len(filenames)
         for index, name in enumerate(filenames):
