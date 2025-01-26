@@ -17,10 +17,16 @@ class Game:
         self.dt = 0
         self.font = pygame.font.SysFont("Liberation Sans", 30)
 
-        self.map = Map(str(level_num), self.main.screen_size)
-        player_pos = (coord * self.map.tile_size for coord in self.map.player_pos)
-        self.player = Player(player_pos)
-        self.checkpoint_time = None
+        try:
+            self.map = Map(str(level_num), self.main.screen_size)
+            player_pos = (coord * self.map.tile_size for coord in self.map.player_pos)
+            self.player = Player(player_pos)
+            self.checkpoint_time = None
+
+        except: # Game loading failed
+            Win(self.main)
+            self.playing = False
+
 
     def loop(self):
         while self.playing:
@@ -267,8 +273,4 @@ class Game:
                     self.playing = False
 
         if self.checkpoint_time != None and pygame.time.get_ticks() - self.checkpoint_time >= 2000:
-            if self.level_num < 2:
-                self.__init__(self.main, self.level_num + 1)
-            else:
-                Win(self.main)
-                self.playing = False
+            self.__init__(self.main, self.level_num + 1)
