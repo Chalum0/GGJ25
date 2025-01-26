@@ -13,6 +13,7 @@ import math
 
 class Game:
     def __init__(self, main, level_num=1):
+        print("you died")
         self.main = main
         self.level_num = level_num
         self.playing = True
@@ -191,7 +192,8 @@ class Game:
                         player.bubble_pos = p
                         x, y = self.player.bubble_pos
                         self.map.grid[y][x] = 0
-                        self.map.placed_bubbles.append(Bubble(1, ((self.map.current_offset_x + x * self.map.tile_size)+self.map.tile_size/2, (self.map.current_offset_y + y * self.map.tile_size)+self.map.tile_size/2), self.map.current_offset_x, self.map.current_offset_y, x * self.map.tile_size, y * self.map.tile_size))
+                        self.map.placed_bubbles.append(Bubble(1, [x * self.map.tile_size, y * self.map.tile_size]))
+                        # self.map.placed_bubbles.append(Bubble(1, ((self.map.current_offset_x + x * self.map.tile_size)+self.map.tile_size/2, (self.map.current_offset_y + y * self.map.tile_size)+self.map.tile_size/2), self.map.current_offset_x, self.map.current_offset_y, x * self.map.tile_size, y * self.map.tile_size))
 
             for tile in self.map.deadly_tiles_rect:
                 if player.rect.colliderect(tile) and not player.bubble_mod:
@@ -223,6 +225,12 @@ class Game:
                             player.y_momentum = 0
                             bubble.falling = True
                             player.on_falling_bubble = True
+
+                if bubble.falling:
+                    bubble.default_y += 0.5
+                bubble.pos = [self.map.current_offset_x + bubble.default_x, self.map.current_offset_y + bubble.default_y]
+                bubble.update_rect()
+
                 b = False
                 for tile in self.map.tiles_rect:
                     if bubble.rect.colliderect(tile):
@@ -235,11 +243,7 @@ class Game:
                     if bubble.rect.y >= screen_size[1] - self.map.max_offset_y:
                         self.map.placed_bubbles.remove(bubble)
 
-                    if bubble.falling:
-                        bubble.default_y += 0.5
-                        bubble.pos = [self.map.current_offset_x + bubble.default_x,
-                                      self.map.current_offset_y + bubble.default_y]
-                        bubble.update_rect()
+
 
         else:
             player.pos = previous_player_pos
@@ -401,13 +405,13 @@ class Game:
 
                 if not len(self.map.placed_bubbles) >= 3:
                     if event.key == control_keys["SPAWN_BUBBLE_UP"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.centerx, self.player.rect.centery - 50], self.map.current_offset_x, self.map.current_offset_y, self.player.rect.centerx, self.player.rect.centery - 50))
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x, self.player.rect.top - self.map.current_offset_y - 50]))
                     if event.key == control_keys["SPAWN_BUBBLE_DOWN"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.centerx, self.player.rect.centery + 50], self.map.current_offset_x, self.map.current_offset_y, self.player.rect.centerx, self.player.rect.centery + 50))
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x, self.player.rect.top - self.map.current_offset_y + 50]))
                     if event.key == control_keys["SPAWN_BUBBLE_LEFT"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.centerx - 50, self.player.rect.centery], self.map.current_offset_x, self.map.current_offset_y, self.player.rect.centerx - 50, self.player.rect.centery))
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x - 50, self.player.rect.top - self.map.current_offset_y]))
                     if event.key == control_keys["SPAWN_BUBBLE_RIGHT"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.centerx + 50, self.player.rect.centery], self.map.current_offset_x, self.map.current_offset_y, self.player.rect.centerx + 50, self.player.rect.centery))
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x + 50, self.player.rect.top - self.map.current_offset_y]))
 
         if self.checkpoint_time != None and pygame.time.get_ticks() - self.checkpoint_time >= 2000:
             self.__init__(self.main, self.level_num + 1)
