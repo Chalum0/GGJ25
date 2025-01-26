@@ -50,28 +50,27 @@ class Win:
         crab_y = self.main.screen_size[1] * .6
         screen.blit(self.crab, (crab_x, crab_y))
 
-        for color_index, x, y, delay in self.bubbles:
+        for color_index, x, y, delay, speed in self.bubbles:
             sprite_count = len(self.bubble_imgs[color_index])
             sprite_index = int(delay * sprite_count) % sprite_count
             screen.blit(self.bubble_imgs[color_index][sprite_index], (x, y))
 
 
     def calculations(self):
-        bubble_speed = 200
-
         for bubble in self.bubbles:
-            bubble[2] -= self.dt * bubble_speed
+            bubble[2] -= self.dt * bubble[4]
             bubble[3] += self.dt
         while len(self.bubbles) > 0 and self.bubbles[0][2] < -100:
             self.bubbles.pop(0)
 
         self.bubble_time -= self.dt
         if self.bubble_time < 0:
+            speed = random.randrange(150, 300)
             color_index = random.randrange(len(self.bubble_imgs))
             bubble_w = self.bubble_imgs[color_index][0].get_width()
             x = (self.main.screen_size[0] - bubble_w) * random.random()
-            y = self.main.screen_size[1] + bubble_speed * self.bubble_time
-            self.bubbles.append([color_index, x, y, -self.bubble_time])
+            y = self.main.screen_size[1] + speed * self.bubble_time
+            self.bubbles.append([color_index, x, y, -self.bubble_time, speed])
             self.bubble_time += .5
 
 
