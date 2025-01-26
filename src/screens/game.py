@@ -1,4 +1,3 @@
-from src.entities import player
 from src.entities.player import Player
 from src.settings.settings import *
 from src.terrain.map import Map
@@ -9,18 +8,18 @@ import math
 
 
 class Game:
-    def __init__(self, main):
+    def __init__(self, main, level_num=1):
         self.main = main
-        self.playing = None
-        self.dt = None
-        self.font = pygame.font.SysFont("Arial", 30)
-
-        self.player = Player()
-        self.map = Map(self.main.screen_size)
-
-    def loop(self):
+        self.level_num = level_num
         self.playing = True
         self.dt = 0
+        self.font = pygame.font.SysFont("Liberation Sans", 30)
+
+        self.map = Map(str(level_num), self.main.screen_size)
+        player_pos = (coord * self.map.tile_size for coord in self.map.player_pos)
+        self.player = Player(player_pos)
+
+    def loop(self):
         while self.playing:
             self.calculations()
             self.render()
@@ -42,7 +41,6 @@ class Game:
             for x in range(len(grid[y])):
                 block = grid[y][x]
                 if block != 0:
-
                     # display
                     if block not in self.map.HIDDEN_BLOCKS:
                         screen.blit(self.map.tiles_texture[block - 1], (self.map.current_offset_x + x * self.map.tile_size, self.map.current_offset_y + y * self.map.tile_size))
@@ -54,7 +52,6 @@ class Game:
                         self.map.tiles_rect.append(rect)
                     if block in self.map.INTERACTION_BLOCKS:
                         self.map.interaction_tiles_rect.append({"type": block, "rect": rect, "pos": (x, y)})
-
 
         screen.blit(self.player.texture, self.player.rect)
 
@@ -131,12 +128,7 @@ class Game:
             player.pos = previous_player_pos
             self.controls_in_bubble(keys)
 
-        self.control_any(keys)
         player.update_rect()
-
-    def control_any(self, keys):
-        if keys[control_keys["RESET"]]:
-            self.playing = False
 
     def controls(self, keys, dt):
         # move player according to controls
@@ -164,7 +156,6 @@ class Game:
             self.player.y_momentum -= self.player.y_acceleration * dt
         if self.player.y_momentum < -self.player.max_y_momentum - 2:
             self.player.y_momentum += self.player.y_acceleration * dt
-
 
         if keys[control_keys["JUMP"]] and self.player.collide_bottom:
             self.player.collide_bottom = False
@@ -194,10 +185,8 @@ class Game:
 
 
     def move_obj(self, obj, dt):
-
         # collisions y
         obj.pos[1] += obj.y_momentum * dt
-
         obj.update_rect()
         tls = []
         for tile in self.map.tiles_rect:
@@ -215,21 +204,26 @@ class Game:
                 obj.y_momentum = 0
             tls.append(tile)
 
-
         # collisions x
         obj.pos[0] += obj.x_momentum * dt
         obj.update_rect()
+        def bound_on_left(bound_x):
+            if obj.x_momentum < 0 and obj.rect.left < bound_x:
+                obj.pos[0] = bound_x
+                obj.collide_left = True
+                obj.x_momentum = 0
+        def bound_on_right(bound_x):
+            if obj.x_momentum > 0 and obj.rect.right > bound_x:
+                obj.pos[0] = bound_x - obj.rect.size[0]
+                obj.collide_right = True
+                obj.x_momentum = 0
+        bound_on_left(0)
+        bound_on_right(self.main.screen_size[0])
         for tile in tls:
             if not obj.rect.colliderect(tile):
                 continue
-            if obj.x_momentum < 0 and obj.rect.left < tile.right:
-                obj.pos[0] = tile.right
-                obj.collide_left = True
-                obj.x_momentum = 0
-            if obj.x_momentum > 0 and obj.rect.right > tile.left:
-                obj.pos[0] = tile.left - obj.rect.size[0]
-                obj.collide_right = True
-                obj.x_momentum = 0
+            bound_on_left(tile.right)
+            bound_on_right(tile.left)
         obj.update_rect()
 
     def check_events(self):
@@ -237,4 +231,9 @@ class Game:
             if event.type == pygame.QUIT:
                 time.sleep(0.5)
                 self.playing = False
-                pygame.quit()
+                self.main.quit = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == control_keys["RESET"]:
+                    self.__init__(self.main, self.level_num)
+                elif event.key == pygame.K_ESCAPE:
+                    self.playing = False
