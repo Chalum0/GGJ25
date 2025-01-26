@@ -7,6 +7,7 @@ class Map:
         "red-bubble": 5,
         "green-bubble": 6,
         "blue-bubble": 7,
+        "checkpoint": 8,
     }
 
     TEXTURES = {
@@ -35,7 +36,7 @@ class Map:
     }
     TRANSPARENT_BLOCKS = [1, 2, 5, 6, 7, 8]
     HIDDEN_BLOCKS = [1]
-    INTERACTION_BLOCKS = [5, 6, 7]
+    INTERACTION_BLOCKS = [5, 6, 7, 8]
 
     def __init__(self, level_name, screen_size):
         self.tile_size = 40

@@ -18,12 +18,13 @@ class Game:
         self.map = Map(str(level_num), self.main.screen_size)
         player_pos = (coord * self.map.tile_size for coord in self.map.player_pos)
         self.player = Player(player_pos)
+        self.checkpoint_time = None
 
     def loop(self):
         while self.playing:
             self.calculations()
-            self.render()
 
+            self.render()
             pygame.display.flip()
 
             self.check_events()
@@ -55,6 +56,12 @@ class Game:
 
         screen.blit(self.player.texture, self.player.rect)
 
+        if self.checkpoint_time != None:
+            black = pygame.Surface(self.main.screen_size)
+            black.fill((0, 0, 0))
+            black.set_alpha((pygame.time.get_ticks() - self.checkpoint_time) * 255 // 2000)
+            screen.blit(black, (0, 0))
+
         fps_text = self.font.render(f"FPS: {int(self.main.clock.get_fps())}", True, (255, 255, 255))
         screen.blit(fps_text, (10, 10))
 
@@ -67,7 +74,8 @@ class Game:
 
         if not player.in_bubble:
             if player.rect.bottom >= screen_size[1] + player.rect.height and self.map.current_offset_y < self.map.max_offset_y:
-                self.playing = False
+                self.__init__(self.main, self.level_num)
+                return
 
             if not player.collide_bottom:
                 if player.y_momentum < player.max_y_momentum:
@@ -116,13 +124,14 @@ class Game:
                         player.in_bubble = True
                         player.x_momentum = 0
                         player.bubble_pos = p
-
                     if t == self.map.INTERACTION_TILES_ID["green-bubble"]:
                         player.bubble_pos = p
                         player.x_momentum = -player.x_momentum * 2
                         player.y_momentum = -min(player.y_momentum * 1.3, player.max_y_momentum/1.2)
                         x, y = self.player.bubble_pos
                         self.map.grid[y][x] = 0
+                    if t == self.map.INTERACTION_TILES_ID["checkpoint"] and self.checkpoint_time == None:
+                        self.checkpoint_time = pygame.time.get_ticks()
 
         else:
             player.pos = previous_player_pos
@@ -237,3 +246,9 @@ class Game:
                     self.__init__(self.main, self.level_num)
                 elif event.key == pygame.K_ESCAPE:
                     self.playing = False
+
+        if self.checkpoint_time != None and pygame.time.get_ticks() - self.checkpoint_time >= 2000:
+            if self.level_num < 2:
+                self.__init__(self.main, self.level_num + 1)
+            else:
+                self.playing = False
