@@ -13,13 +13,17 @@ class MainMenu:
 
         self.crab = pygame.image.load('src/textures/crab.png')
         self.crab = pygame.transform.scale_by(self.crab, 2)
-        self.bubbles = [pygame.image.load(f'src/textures/bubble-{name}.png') for name in ('red', 'green')]
-        self.bubbles = [pygame.transform.scale(bubble, (50, 50)) for bubble in self.bubbles]
+        self.bubbles = [
+            [pygame.image.load(f'src/textures/bubble-{name}{i}.png') for i in range(1, 5)]
+            for name in ('red', 'green')
+        ]
+        self.bubbles = [[pygame.transform.scale(img, (50, 50)) for img in l] for l in self.bubbles]
 
         self.buttons = [(.35, "Play"), (.51, "Resume"), (.67, "Credits"), (.83, "Quit")]
         self.button_height = self.main.screen_size[1] * .15
         self.cursor = 0
 
+        self.game_ambiance = pygame.mixer.Sound('src/audio/game_ambiance.ogg')
         pygame.mixer.music.load('src/audio/menu_music.ogg')
         pygame.mixer.music.play(-1)
 
@@ -51,10 +55,11 @@ class MainMenu:
         screen = self.main.screen
         screen.fill((0, 0, 255))
 
-        for bubble, bubble_x in zip(self.bubbles, (.15, .85)):
-            bubble_x = self.main.screen_size[0] * bubble_x - bubble.get_width() / 2
-            bubble_y = self.main.screen_size[1] * .15 - bubble.get_height() / 2
-            screen.blit(bubble, (bubble_x, bubble_y))
+        for bubble_imgs, bubble_x in zip(self.bubbles, (.15, .85)):
+            img_index = pygame.time.get_ticks() // (1000 // len(bubble_imgs)) % len(bubble_imgs)
+            bubble_x = self.main.screen_size[0] * bubble_x - bubble_imgs[img_index].get_width() / 2
+            bubble_y = self.main.screen_size[1] * .15 - bubble_imgs[img_index].get_height() / 2
+            screen.blit(bubble_imgs[img_index], (bubble_x, bubble_y))
         self.draw_centered_text(self.title_font, "Bubble Passage", .15, (255, 255, 255))
 
         for index, (button_y, label) in enumerate(self.buttons):
@@ -72,11 +77,11 @@ class MainMenu:
 
 
     def launch_game(self, level_num):
-        pygame.mixer.music.stop()
-        pygame.mixer.music.load('src/audio/music.ogg')
+        pygame.mixer.music.load('src/audio/game_music.ogg')
         pygame.mixer.music.play(-1)
+        self.game_ambiance.play(-1)
         Game(self.main, level_num).loop()
-        pygame.mixer.music.stop()
+        self.game_ambiance.stop()
         pygame.mixer.music.load('src/audio/menu_music.ogg')
         pygame.mixer.music.play(-1)
 

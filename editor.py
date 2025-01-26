@@ -43,7 +43,7 @@ class Editor:
 
 
     def load_textures(self):
-        filenames = ['crab', 'wall', 'urchin1', 'urchin2', 'bubble-red', 'bubble-green', 'bubble-blue', 'crabette1',
+        filenames = ['crab', 'wall', 'urchin1', 'urchin2', 'bubble-red1', 'bubble-green1', 'bubble-blue1', 'crabette1',
             'plant1', 'plant2', 'plant3', 'plant4', 'bigplant1', 'bigplant2']
         self.textures = [None] * len(filenames)
         for index, name in enumerate(filenames):
@@ -86,9 +86,9 @@ class Editor:
         return index
 
     def pixel_pos_to_tile_pos(self, x, y):
-        return ((x - self.scroll_x) // self.tile_width, (y - self.scroll_y) // self.tile_height)
+        return ((x + self.scroll_x) // self.tile_width, (y + self.scroll_y) // self.tile_height)
     def tile_pos_to_pixel_pos(self, x, y):
-        return (x * self.tile_width + self.scroll_x, y * self.tile_height + self.scroll_y)
+        return (x * self.tile_width - self.scroll_x, y * self.tile_height - self.scroll_y)
 
     def texture_pos_px(self, x, y, texture):
         tile_x = self.tile_width * x + (self.tile_width - texture.get_width()) // 2 - self.scroll_x

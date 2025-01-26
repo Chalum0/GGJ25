@@ -89,7 +89,7 @@ class Game:
                         block_y = self.map.current_offset_y + y * self.map.tile_size
                         texture = self.map.tiles_texture[block - 1]
                         if isinstance(texture, list):
-                            index = pygame.time.get_ticks() // 500 % 2
+                            index = pygame.time.get_ticks() // (1000 // len(texture)) % len(texture)
                             screen.blit(texture[index], (block_x, block_y))
                         else:
                             screen.blit(texture, (block_x, block_y))

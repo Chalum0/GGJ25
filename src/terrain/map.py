@@ -14,9 +14,9 @@ class Map:
         2: "wall",  # wall without collisions
         3: ["urchin1", "urchin2"],  # damages
         4: ["urchin2", "urchin1"],  # damages
-        5: "bubble-red",  # red bubbles
-        6: "bubble-green",  # green bubbles
-        7: "bubble-blue",  # blue bubbles
+        5: [f"bubble-red{i}" for i in range(1, 5)],  # red bubbles
+        6: [f"bubble-green{i}" for i in range(1, 5)],  # green bubbles
+        7: [f"bubble-blue{i}" for i in range(1, 5)],  # blue bubbles
         8: ["crabette1", "crabette2"],  # checkpoint
         9: "wall-top",
         10: "wall-bottom",
