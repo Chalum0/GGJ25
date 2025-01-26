@@ -61,7 +61,7 @@ class Game:
                 if block != 0:
                     # display
                     
-                    if block not in self.map.HIDDEN_BLOCKS:
+                    if block not in self.map.HIDDEN_TILES:
                         block_x = self.map.current_offset_x + x * self.map.tile_size
                         block_y = self.map.current_offset_y + y * self.map.tile_size
                         texture = self.map.tiles_texture[block - 1]
@@ -93,8 +93,6 @@ class Game:
             black.set_alpha((pygame.time.get_ticks() - self.checkpoint_time) * 255 // 2000)
             screen.blit(black, (0, 0))
 
-        fps_text = self.font.render(f"FPS: {int(self.main.clock.get_fps())}", True, (255, 255, 255))
-        screen.blit(fps_text, (10, 10))
 
     def calculations(self):
         player = self.player
