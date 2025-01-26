@@ -405,13 +405,13 @@ class Game:
 
                 if not len(self.map.placed_bubbles) >= 3:
                     if event.key == control_keys["SPAWN_BUBBLE_UP"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x, self.player.rect.top - self.map.current_offset_y - 50]))
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x, self.player.rect.top - self.map.current_offset_y - 60]))
                     if event.key == control_keys["SPAWN_BUBBLE_DOWN"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x, self.player.rect.top - self.map.current_offset_y + 50]))
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x, self.player.rect.top - self.map.current_offset_y + 60]))
                     if event.key == control_keys["SPAWN_BUBBLE_LEFT"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x - 50, self.player.rect.top - self.map.current_offset_y]))
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x - 60, self.player.rect.top - self.map.current_offset_y]))
                     if event.key == control_keys["SPAWN_BUBBLE_RIGHT"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x + 50, self.player.rect.top - self.map.current_offset_y]))
+                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x + 60, self.player.rect.top - self.map.current_offset_y]))
 
         if self.checkpoint_time != None and pygame.time.get_ticks() - self.checkpoint_time >= 2000:
             self.__init__(self.main, self.level_num + 1)
