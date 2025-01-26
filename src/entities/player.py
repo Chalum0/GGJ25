@@ -43,13 +43,15 @@ class Player(GameObj):
 
         crab_size = (40, 20)
         self.load_texture('./src/textures/crab-idle.png', crab_size)
-        self.death_textures = [pygame.image.load(f'./src/textures/crab-dies{i}.png').convert_alpha() for i in range(1, 4)]
-        self.death_textures = [pygame.transform.scale(img, crab_size) for img in self.death_textures]
+        self.walk_textures = [pygame.image.load(f'./src/textures/crab-walk{i}.png').convert_alpha() for i in range(1, 4)]
+        self.walk_textures = [pygame.transform.scale(img, crab_size) for img in self.walk_textures]
         self.jump_textures = [
             pygame.image.load(f'./src/textures/crab-{action}.png').convert_alpha()
             for action in ('jumping', 'gliding', 'falling')
         ]
         self.jump_textures = [pygame.transform.scale(img, crab_size) for img in self.jump_textures]
+        self.death_textures = [pygame.image.load(f'./src/textures/crab-dies{i}.png').convert_alpha() for i in range(1, 4)]
+        self.death_textures = [pygame.transform.scale(img, crab_size) for img in self.death_textures]
 
     def toggle_bubble_mod(self, mp):
         if not self.bubble_mod:
@@ -92,4 +94,7 @@ class Player(GameObj):
                     texture = self.jump_textures[2]
                 else:
                     texture = self.jump_textures[1]
+            elif self.x_momentum != 0:
+                img_index = pygame.time.get_ticks() * len(self.walk_textures) // 1000 % len(self.walk_textures)
+                texture = self.walk_textures[img_index]
         screen.blit(texture, self.rect)
