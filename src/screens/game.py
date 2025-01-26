@@ -34,7 +34,11 @@ class Game:
     def render(self):
         screen = self.main.screen
         grid = self.map.grid
-        screen.fill((0, 0, 128))
+
+        screen.fill((64, 64, 64))
+        end_x = len(grid[0]) * self.map.tile_size - self.map.current_offset_x
+        end_y = len(grid) * self.map.tile_size - self.map.current_offset_y
+        pygame.draw.rect(screen, (0, 0, 128), (0, 0, end_x, end_y))
 
         self.map.tiles_rect = []
         self.map.interaction_tiles_rect = []
