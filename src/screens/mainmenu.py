@@ -23,6 +23,7 @@ class MainMenu:
         self.button_height = self.main.screen_size[1] * .15
         self.cursor = 0
 
+        self.game_ambiance = pygame.mixer.Sound('src/audio/game_ambiance.ogg')
         pygame.mixer.music.load('src/audio/menu_music.ogg')
         pygame.mixer.music.play(-1)
 
@@ -76,11 +77,11 @@ class MainMenu:
 
 
     def launch_game(self, level_num):
-        pygame.mixer.music.stop()
-        pygame.mixer.music.load('src/audio/music.ogg')
+        pygame.mixer.music.load('src/audio/game_music.ogg')
         pygame.mixer.music.play(-1)
+        self.game_ambiance.play(-1)
         Game(self.main, level_num).loop()
-        pygame.mixer.music.stop()
+        self.game_ambiance.stop()
         pygame.mixer.music.load('src/audio/menu_music.ogg')
         pygame.mixer.music.play(-1)
 
