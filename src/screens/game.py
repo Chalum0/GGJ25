@@ -174,6 +174,7 @@ class Game:
                         player.pos = [rect.x, rect.y + player.rect.height/2]
                         player.in_bubble = True
                         player.x_momentum = 0
+                        player.y_momentum = 0
                         player.bubble_pos = p
                     if t == self.map.INTERACTION_TILES_ID["green-bubble"]:
                         player.bubble_pos = p
@@ -190,13 +191,38 @@ class Game:
                         player.bubble_pos = p
                         x, y = self.player.bubble_pos
                         self.map.grid[y][x] = 0
-                        self.map.placed_bubbles.append(Bubble(1, ((self.map.current_offset_x + x * self.map.tile_size), (self.map.current_offset_y + y * self.map.tile_size)), self.map.current_offset_x, self.map.current_offset_y, x * self.map.tile_size, y * self.map.tile_size))
+                        self.map.placed_bubbles.append(Bubble(1, ((self.map.current_offset_x + x * self.map.tile_size)+self.map.tile_size/2, (self.map.current_offset_y + y * self.map.tile_size)+self.map.tile_size/2), self.map.current_offset_x, self.map.current_offset_y, x * self.map.tile_size, y * self.map.tile_size))
 
             for tile in self.map.deadly_tiles_rect:
                 if player.rect.colliderect(tile) and not player.bubble_mod:
                     self.__init__(self.main, self.level_num)
 
             for bubble in self.map.placed_bubbles:
+                if player.rect.colliderect(bubble.rect):
+                    if player.bubble_mod and self.player.bubble_color == bubble.color:
+                        self.map.placed_bubbles.remove(bubble)
+
+                    elif not player.bubble_mod:
+                        if bubble.color == 2:
+                            player.pos = [bubble.rect.x, bubble.rect.y + player.rect.height / 2]
+                            player.in_bubble = True
+                            player.x_momentum = 0
+                            player.y_momentum = 0
+                            player.bubble_pos = bubble.pos
+                            self.player.bubble_element = bubble
+
+                        if bubble.color == 3:
+                            player.bubble_pos = bubble.pos
+                            player.x_momentum = -player.x_momentum * 2
+                            player.y_momentum = -min(player.y_momentum * 1.3, player.max_y_momentum / 1.2)
+                            self.map.placed_bubbles.remove(bubble)
+
+                        if bubble.color == 1:
+                            # player.rect.center = bubble.rect.center
+                            player.x_momentum = 0
+                            player.y_momentum = 0
+                            bubble.falling = True
+                            player.on_falling_bubble = True
                 b = False
                 for tile in self.map.tiles_rect:
                     if bubble.rect.colliderect(tile):
@@ -209,34 +235,10 @@ class Game:
                     if bubble.rect.y >= screen_size[1] - self.map.max_offset_y:
                         self.map.placed_bubbles.remove(bubble)
 
-                    if player.rect.colliderect(bubble.rect):
-                        if player.bubble_mod and self.player.bubble_color == bubble.color:
-                            self.map.placed_bubbles.remove(bubble)
-
-                        elif not player.bubble_mod:
-                            if bubble.color == 2:
-                                player.pos = [bubble.rect.x, bubble.rect.y + player.rect.height / 2]
-                                player.in_bubble = True
-                                player.x_momentum = 0
-                                player.bubble_pos = bubble.pos
-                                self.player.bubble_element = bubble
-
-                            if bubble.color == 3:
-                                player.bubble_pos = bubble.pos
-                                player.x_momentum = -player.x_momentum * 2
-                                player.y_momentum = -min(player.y_momentum * 1.3, player.max_y_momentum / 1.2)
-                                self.map.placed_bubbles.remove(bubble)
-
-                            if bubble.color == 1:
-                                # player.rect.center = bubble.rect.center
-                                player.x_momentum = 0
-                                player.y_momentum = 0
-                                bubble.falling = True
-                                player.on_falling_bubble = True
-
                     if bubble.falling:
                         bubble.default_y += 0.5
-                        bubble.pos = [self.map.current_offset_x + bubble.default_x - self.map.tile_size/2, self.map.current_offset_y + bubble.default_y - self.map.tile_size/2]
+                        bubble.pos = [self.map.current_offset_x + bubble.default_x,
+                                      self.map.current_offset_y + bubble.default_y]
                         bubble.update_rect()
 
         else:
