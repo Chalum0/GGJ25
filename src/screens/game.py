@@ -141,7 +141,11 @@ class Game:
             player.pos = previous_player_pos
             self.controls_in_bubble(keys)
 
+        self.control_any(keys)
         player.update_rect()
+
+    def control_any(self, keys):
+        pass
 
     def controls(self, keys, dt):
         # move player according to controls
