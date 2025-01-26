@@ -40,16 +40,16 @@ class Map:
         28: "bigplant1",
         29: "bigplant2",
     }
-    TRANSPARENT_BLOCKS = [1, 2, 5, 6, 7, 8, 24, 25, 26, 27, 28, 29]
-    HIDDEN_BLOCKS = [1]
-    INTERACTION_BLOCKS = [5, 6, 7, 8]
+    TRANSPARENT_TILES = [1, 2, 3, 4, 5, 6, 7, 8, 24, 25, 26, 27, 28, 29]
+    HIDDEN_TILES = [1]
+    INTERACTION_TILES = [5, 6, 7, 8]
+    DEADLY_TILES = [3, 4]
 
     def __init__(self, level_name, screen_size):
         self.tile_size = 40
         self.grid = None
         self.player_pos = (0, 0)
         self.load_map(level_name)
-
         self.min_offset_x = 0
         self.max_offset_x = - len(self.grid[0]) * self.tile_size + screen_size[0]
         self.min_offset_y = 0
@@ -60,6 +60,9 @@ class Map:
         self.tiles_texture = [None]
         self.tiles_rect = []
         self.interaction_tiles_rect = []
+        self.deadly_tiles_rect = []
+
+        self.placed_bubbles = []
 
         self.load_textures()
 
