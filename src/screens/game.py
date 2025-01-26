@@ -1,6 +1,7 @@
 from src.entities.player import Player
 from src.settings.settings import *
 from src.terrain.map import Map
+from src.screens.win import Win
 
 import pygame
 import json
@@ -262,4 +263,5 @@ class Game:
             if self.level_num < 2:
                 self.__init__(self.main, self.level_num + 1)
             else:
+                Win(self.main)
                 self.playing = False
