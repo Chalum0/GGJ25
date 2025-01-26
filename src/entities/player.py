@@ -2,9 +2,9 @@ from src.entities.gameobj import GameObj
 
 class Player(GameObj):
 
-    def __init__(self):
+    def __init__(self, pos):
         super().__init__()
-        self.pos = [0, 0]
+        self.pos = list(pos)
         self.texture = None
 
         self.jump_power = -7
@@ -26,4 +26,4 @@ class Player(GameObj):
         self.in_bubble = False
         self.bubble_pos = None
 
-        self.load_texture('./src/textures/crab_idle.png', (40, 20))
+        self.load_texture('./src/textures/crab.png', (40, 20))
