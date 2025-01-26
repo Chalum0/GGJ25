@@ -4,3 +4,4 @@ __pycache__
 build/
 dist/
 save.json
+src/settings/save.json

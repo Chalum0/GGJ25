@@ -43,6 +43,7 @@ class Player(GameObj):
             self.before_bubble_offset_x = mp.current_offset_x
             self.before_bubble_offset_y = mp.current_offset_y
             self.before_bubble_pos = [self.pos[0], self.pos[1]]
+            self.pos[1] -= 12
             match self.bubble_color:
                 case 1:
                     self.load_texture('./src/textures/white_bubble_blue_idle1.png', (32, 32))
