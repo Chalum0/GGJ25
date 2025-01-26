@@ -1,6 +1,7 @@
 from src.screens.game import Game
 from src.screens.credits import Credits
 import pygame
+import json
 
 
 class MainMenu:
@@ -15,7 +16,7 @@ class MainMenu:
         self.bubbles = [pygame.image.load(f'src/textures/bubble-{name}.png') for name in ('red', 'green')]
         self.bubbles = [pygame.transform.scale(bubble, (50, 50)) for bubble in self.bubbles]
 
-        self.buttons = [(.43, "Play"), (.63, "Credits"), (.83, "Quit")]
+        self.buttons = [(.35, "Play"), (.51, "Resume"), (.67, "Credits"), (.83, "Quit")]
         self.button_height = self.main.screen_size[1] * .15
         self.cursor = 0
 
@@ -44,7 +45,7 @@ class MainMenu:
             bubble_x = self.main.screen_size[0] * bubble_x - bubble.get_width() / 2
             bubble_y = self.main.screen_size[1] * .2 - bubble.get_height() / 2
             screen.blit(bubble, (bubble_x, bubble_y))
-        self.draw_centered_text(self.title_font, "Bubble Passage", .2)
+        self.draw_centered_text(self.title_font, "Bubble Passage", .15)
 
         for index, (button_y, label) in enumerate(self.buttons):
             if index == self.cursor:
@@ -64,8 +65,14 @@ class MainMenu:
             case 0:
                 Game(self.main).loop()
             case 1:
-                Credits(self.main).loop()
+                try:
+                    level_num = json.load(open('src/settings/save.json', 'r'))
+                    Game(self.main, level_num).loop()
+                except:
+                    pass
             case 2:
+                Credits(self.main).loop()
+            case 3:
                 self.main.quit = True
 
     def check_events(self):

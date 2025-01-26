@@ -3,6 +3,7 @@ from src.settings.settings import *
 from src.terrain.map import Map
 
 import pygame
+import json
 import time
 import math
 
@@ -30,6 +31,8 @@ class Game:
             self.check_events()
 
             self.dt = self.main.clock.tick(self.main.max_fps) / 1000
+
+        json.dump(self.level_num, open('src/settings/save.json', 'w'))
 
     def render(self):
         screen = self.main.screen
