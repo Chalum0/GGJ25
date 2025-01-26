@@ -14,7 +14,7 @@ class Main:
         self.max_fps = 120
 
         pygame.mixer.music.load('src/audio/music.ogg')
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(-1)
 
         self.quit = False
         MainMenu(self).loop()
