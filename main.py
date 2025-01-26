@@ -9,8 +9,12 @@ class Main:
         self.screen_size = (1080, 720)
         self.screen = pygame.display.set_mode(self.screen_size)
         pygame.display.set_icon(pygame.image.load('src/textures/crab.png'))
+
         self.clock = pygame.time.Clock()
         self.max_fps = 120
+
+        pygame.mixer.music.load('src/audio/music.ogg')
+        pygame.mixer.music.play()
 
         self.quit = False
         MainMenu(self).loop()

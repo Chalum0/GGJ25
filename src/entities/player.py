@@ -2,9 +2,9 @@ from src.entities.gameobj import GameObj
 
 class Player(GameObj):
 
-    def __init__(self):
+    def __init__(self, pos):
         super().__init__()
-        self.pos = [0, 0]
+        self.pos = list(pos)
         self.texture = None
 
         self.jump_power = -7
@@ -29,7 +29,6 @@ class Player(GameObj):
         self.before_bubble_offset_y = None
         self.bubble_element = None
         self.on_falling_bubble = False
-
         self.max_placed_bubbles = 3
 
         self.bubble_mod = False
