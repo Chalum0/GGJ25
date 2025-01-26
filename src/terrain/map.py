@@ -12,8 +12,8 @@ class Map:
 
     TEXTURES = {
         2: "wall",  # wall without collisions
-        3: "urchin",  # damages
-        4: "urchin",  # damages
+        3: ["urchin1", "urchin2"],  # damages
+        4: ["urchin2", "urchin1"],  # damages
         5: "bubble-red",  # red bubbles
         6: "bubble-green",  # green bubbles
         7: "bubble-blue",  # blue bubbles

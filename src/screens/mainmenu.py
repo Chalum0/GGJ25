@@ -20,6 +20,9 @@ class MainMenu:
         self.button_height = self.main.screen_size[1] * .15
         self.cursor = 0
 
+        pygame.mixer.music.load('src/audio/menu_music.ogg')
+        pygame.mixer.music.play(-1)
+
         self.can_resume = False
         try:
             json.load(open('src/settings/save.json', 'r'))
@@ -68,15 +71,24 @@ class MainMenu:
             self.draw_centered_text(self.button_font, label, button_y, color)
 
 
+    def launch_game(self, level_num):
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load('src/audio/music.ogg')
+        pygame.mixer.music.play(-1)
+        Game(self.main, level_num).loop()
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load('src/audio/menu_music.ogg')
+        pygame.mixer.music.play(-1)
+
     def press_button(self):
         match self.cursor:
             case 0:
-                Game(self.main).loop()
+                self.launch_game(1)
                 self.can_resume = True
             case 1:
                 try:
                     level_num = json.load(open('src/settings/save.json', 'r'))
-                    Game(self.main, level_num).loop()
+                    self.launch_game(level_num)
                 except:
                     pass
             case 2:
