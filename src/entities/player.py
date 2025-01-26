@@ -28,6 +28,7 @@ class Player(GameObj):
         self.before_bubble_offset_x = None
         self.before_bubble_offset_y = None
         self.bubble_element = None
+        self.on_falling_bubble = False
 
         self.max_placed_bubbles = 3
 
