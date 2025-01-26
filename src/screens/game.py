@@ -52,7 +52,14 @@ class Game:
                 if block != 0:
                     # display
                     if block not in self.map.HIDDEN_BLOCKS:
-                        screen.blit(self.map.tiles_texture[block - 1], (self.map.current_offset_x + x * self.map.tile_size, self.map.current_offset_y + y * self.map.tile_size))
+                        block_x = self.map.current_offset_x + x * self.map.tile_size
+                        block_y = self.map.current_offset_y + y * self.map.tile_size
+                        texture = self.map.tiles_texture[block - 1]
+                        if isinstance(texture, list):
+                            index = pygame.time.get_ticks() // 500 % 2
+                            screen.blit(texture[index], (block_x, block_y))
+                        else:
+                            screen.blit(texture, (block_x, block_y))
 
                     # add collision
                     rect = pygame.rect.Rect(0, 0, self.map.tile_size, self.map.tile_size)

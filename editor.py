@@ -40,7 +40,7 @@ class Editor:
 
 
     def load_textures(self):
-        filenames = ['crab', 'wall', 'urchin', 'urchin', 'bubble-red', 'bubble-green', 'bubble-blue', 'checkpoint']
+        filenames = ['crab', 'wall', 'urchin', 'urchin', 'bubble-red', 'bubble-green', 'bubble-blue', 'crabette1']
         self.textures = [None] * len(filenames)
         for index, name in enumerate(filenames):
             texture = pygame.image.load(f'src/textures/{name}.png').convert_alpha()
