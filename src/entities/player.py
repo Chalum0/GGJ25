@@ -59,8 +59,7 @@ class Player(GameObj):
             self.before_bubble_offset_y = mp.current_offset_y
             self.before_bubble_pos = [self.pos[0], self.pos[1]]
             self.pos[1] -= 12
-            self.change_bubble_color(self.bubble_color)
-            self.load_texture('./src/textures/bubble-white.png', (32, 32))
+            self.change_bubble_color(self.bubble_color, True)
         else:
             mp.current_offset_x = self.before_bubble_offset_x
             mp.current_offset_y = self.before_bubble_offset_y
@@ -72,9 +71,9 @@ class Player(GameObj):
 
         self.bubble_mod = not self.bubble_mod
 
-    def change_bubble_color(self, color):
+    def change_bubble_color(self, color, force=False):
         self.bubble_color = color
-        if self.bubble_mod:
+        if self.bubble_mod or force:
             match self.bubble_color:
                 case 1:
                     self.load_texture('./src/textures/bubble-white-blue.png', (32, 32))
