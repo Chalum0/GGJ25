@@ -13,7 +13,6 @@ import math
 
 class Game:
     def __init__(self, main, level_num=1):
-        print("you died")
         self.main = main
         self.level_num = level_num
         self.playing = True
@@ -233,7 +232,7 @@ class Game:
 
                 b = False
                 for tile in self.map.tiles_rect:
-                    if bubble.rect.colliderect(tile):
+                    if tile.collidepoint(bubble.rect.center):
                         self.map.placed_bubbles.remove(bubble)
                         break
                 else:

@@ -38,8 +38,7 @@ class Player(GameObj):
         self.load_texture('./src/textures/crab-idle.png', (40, 20))
 
     def toggle_bubble_mod(self, mp):
-        self.bubble_mod = not self.bubble_mod
-        if self.bubble_mod:
+        if not self.bubble_mod:
             self.before_bubble_offset_x = mp.current_offset_x
             self.before_bubble_offset_y = mp.current_offset_y
             self.before_bubble_pos = [self.pos[0], self.pos[1]]
@@ -56,8 +55,11 @@ class Player(GameObj):
             mp.current_offset_y = self.before_bubble_offset_y
             self.pos[0] = self.before_bubble_pos[0]
             self.pos[1] = self.before_bubble_pos[1]
-            self.update_rect()
+            self.rect.x = self.pos[0]
+            self.rect.y = self.pos[1]
             self.load_texture('./src/textures/crab-idle.png', (40, 20))
+
+        self.bubble_mod = not self.bubble_mod
 
     def change_buble_color(self, color):
         self.bubble_color = color
