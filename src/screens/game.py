@@ -17,7 +17,11 @@ class Game:
         self.level_num = level_num
         self.playing = True
         self.dt = 0
+        self.keys = [False] * 500
+
         self.font = pygame.font.SysFont("Liberation Sans", 30)
+        self.jump_sound = pygame.mixer.Sound('src/audio/jump.wav')
+        self.death_sound = pygame.mixer.Sound('src/audio/death.wav')
 
         try:
             self.map = Map(str(level_num), self.main.screen_size)
@@ -25,14 +29,34 @@ class Game:
             self.player = Player(player_pos)
             self.checkpoint_time = None
 
-        except: # Game loading failed
+        except: # Map loading failed
             Win(self.main)
             self.playing = False
 
 
+    def reset(self):
+        self.__init__(self.main, self.level_num)
+
+    def die(self):
+        if self.player.death_time == None:
+            self.death_sound.play()
+            self.player.death_time = 0
+            self.player.pos[1] = min(self.player.pos[1], self.main.screen_size[1] - 20)
+            self.player.update_rect()
+
+    def jump(self):
+        self.player.jumping = True
+        self.jump_sound.play()
+
+
     def loop(self):
         while self.playing:
-            self.calculations()
+            if self.player.death_time == None:
+                self.calculations()
+            else:
+                self.player.death_time += self.dt
+                if self.player.death_time > Player.DYING_TIME:
+                    self.reset()
 
             self.render()
             pygame.display.flip()
@@ -70,9 +94,6 @@ class Game:
 
         screen.fill((64, 64, 64))
         self.draw_vertical_gradient()
-        end_x = len(grid[0]) * self.map.tile_size - self.map.current_offset_x
-        end_y = len(grid) * self.map.tile_size - self.map.current_offset_y
-        # pygame.draw.rect(screen, (0, 0, 128), (0, 0, end_x, end_y))
 
         self.map.tiles_rect = []
         self.map.interaction_tiles_rect = []
@@ -82,7 +103,6 @@ class Game:
                 block = grid[y][x]
                 if block != 0:
                     # display
-                    
                     if block not in self.map.HIDDEN_TILES:
                         block_x = self.map.current_offset_x + x * self.map.tile_size
                         block_y = self.map.current_offset_y + y * self.map.tile_size
@@ -106,8 +126,8 @@ class Game:
 
         for bubble in self.map.placed_bubbles:
             screen.blit(bubble.texture, bubble.rect)
-            
-        screen.blit(self.player.texture, self.player.rect)
+
+        self.player.draw(screen)
 
         if self.checkpoint_time != None:
             black = pygame.Surface(self.main.screen_size)
@@ -125,7 +145,7 @@ class Game:
 
         if not player.in_bubble:
             if player.rect.top >= self.map.current_offset_y + screen_size[1]:
-                self.__init__(self.main, self.level_num)
+                self.die()
                 return
 
             if not player.collide_bottom and not player.bubble_mod:
@@ -139,7 +159,7 @@ class Game:
                 player.y_momentum = 0
 
 
-            self.controls(keys, dt)
+            self.controls(self.keys, dt)
 
             player.collide_bottom = False
 
@@ -196,7 +216,7 @@ class Game:
 
             for tile in self.map.deadly_tiles_rect:
                 if player.rect.colliderect(tile) and not player.bubble_mod:
-                    self.__init__(self.main, self.level_num)
+                    self.die()
 
             for bubble in self.map.placed_bubbles:
                 if player.rect.colliderect(bubble.rect):
@@ -246,20 +266,18 @@ class Game:
 
         else:
             player.pos = previous_player_pos
-            self.controls_in_bubble(keys)
+            self.controls_in_bubble(self.keys)
 
-        self.control_any(keys)
+        self.control_any(self.keys)
         player.update_rect()
 
     def control_any(self, keys):
-        pass
-
         if keys[control_keys["SWITCH_BLUE"]]:
-            self.player.change_buble_color(1)
+            self.player.change_bubble_color(1)
         if keys[control_keys["SWITCH_RED"]]:
-            self.player.change_buble_color(2)
+            self.player.change_bubble_color(2)
         if keys[control_keys["SWITCH_GREEN"]]:
-            self.player.change_buble_color(3)
+            self.player.change_bubble_color(3)
 
     def controls(self, keys, dt):
         # move player according to controls
@@ -296,10 +314,6 @@ class Game:
                     self.player.y_momentum = 0
 
 
-
-
-
-
         # if player goes over the speed limit (exemple: dashes)
         if self.player.x_momentum > self.player.max_x_momentum + 2:
             self.player.x_momentum -= self.player.x_acceleration * dt * 2
@@ -314,6 +328,7 @@ class Game:
             self.player.on_falling_bubble = False
             self.player.collide_bottom = False
             self.player.y_momentum = self.player.jump_power
+            self.jump()
 
     def controls_in_bubble(self, keys):
         if keys[control_keys["RIGHT"]] and keys[control_keys["JUMP"]]:
@@ -334,6 +349,7 @@ class Game:
 
         if (keys[control_keys["RIGHT"]] or keys[control_keys["LEFT"]] or keys[control_keys["UP"]] or keys[control_keys["DOWN"]]) and keys[control_keys["JUMP"]]:
             self.player.in_bubble = False
+            self.jump()
             try:
                 x, y = self.player.bubble_pos
                 self.map.grid[y][x] = 0
@@ -362,6 +378,8 @@ class Game:
                 obj.pos[1] = tile.top - obj.rect.size[1]
                 obj.collide_bottom = True
                 obj.y_momentum = 0
+                if obj == self.player:
+                    self.player.jumping = False
             tls.append(tile)
 
         # collisions x
@@ -386,31 +404,41 @@ class Game:
             bound_on_right(tile.left)
         obj.update_rect()
 
+    def place_bubble(self, dx, dy):
+        x = self.player.rect.left - self.map.current_offset_x + dx
+        y = self.player.rect.top - self.map.current_offset_y + dy
+        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [x, y]))
+
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 time.sleep(0.5)
                 self.playing = False
                 self.main.quit = True
-                
+
             elif event.type == pygame.KEYDOWN:
-                if event.key == control_keys["RESET"]:
-                    self.__init__(self.main, self.level_num)
+                self.keys[event.scancode] = True
+
+                if event.scancode == control_keys["RESET"]:
+                    self.reset()
                 elif event.key == pygame.K_ESCAPE:
                     self.playing = False
                     
-                if (event.key == control_keys["BUBBLE"] and self.player.x_momentum == 0 and -0.5 < self.player.y_momentum < 0.5 and not self.player.in_bubble) or (event.key == control_keys["BUBBLE"] and self.player.bubble_mod):
+                if (event.scancode == control_keys["BUBBLE"] and self.player.x_momentum == 0 and -0.5 < self.player.y_momentum < 0.5 and not self.player.in_bubble) or (event.key == control_keys["BUBBLE"] and self.player.bubble_mod):
                     self.player.toggle_bubble_mod(self.map)
 
-                if not len(self.map.placed_bubbles) >= 3:
-                    if event.key == control_keys["SPAWN_BUBBLE_UP"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x, self.player.rect.top - self.map.current_offset_y - 60]))
-                    if event.key == control_keys["SPAWN_BUBBLE_DOWN"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x, self.player.rect.top - self.map.current_offset_y + 60]))
-                    if event.key == control_keys["SPAWN_BUBBLE_LEFT"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x - 60, self.player.rect.top - self.map.current_offset_y]))
-                    if event.key == control_keys["SPAWN_BUBBLE_RIGHT"] and self.player.bubble_mod:
-                        self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [self.player.rect.left - self.map.current_offset_x + 60, self.player.rect.top - self.map.current_offset_y]))
+                if len(self.map.placed_bubbles) < 3 and self.player.bubble_mod:
+                    if event.scancode == control_keys["SPAWN_BUBBLE_UP"]:
+                        self.place_bubble(0, -60)
+                    if event.scancode == control_keys["SPAWN_BUBBLE_DOWN"]:
+                        self.place_bubble(0, 60)
+                    if event.scancode == control_keys["SPAWN_BUBBLE_LEFT"]:
+                        self.place_bubble(-60, 0)
+                    if event.scancode == control_keys["SPAWN_BUBBLE_RIGHT"]:
+                        self.place_bubble(60, 0)
+
+            elif event.type == pygame.KEYUP:
+                self.keys[event.scancode] = False
 
         if self.checkpoint_time != None and pygame.time.get_ticks() - self.checkpoint_time >= 2000:
             self.__init__(self.main, self.level_num + 1)

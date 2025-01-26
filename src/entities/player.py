@@ -1,6 +1,9 @@
 from src.entities.gameobj import GameObj
+import pygame
 
 class Player(GameObj):
+
+    DYING_TIME = 1.
 
     def __init__(self, pos):
         super().__init__()
@@ -35,7 +38,20 @@ class Player(GameObj):
         self.before_bubble_pos = None
         self.bubble_color = 1  # 1: blue, 2: red, 3: green
 
-        self.load_texture('./src/textures/crab-idle.png', (40, 20))
+        self.death_time = None
+        self.jumping = False
+
+        crab_size = (40, 20)
+        self.load_texture('./src/textures/crab-idle.png', crab_size)
+        self.walk_textures = [pygame.image.load(f'./src/textures/crab-walk{i}.png').convert_alpha() for i in range(1, 4)]
+        self.walk_textures = [pygame.transform.scale(img, crab_size) for img in self.walk_textures]
+        self.jump_textures = [
+            pygame.image.load(f'./src/textures/crab-{action}.png').convert_alpha()
+            for action in ('jumping', 'gliding', 'falling')
+        ]
+        self.jump_textures = [pygame.transform.scale(img, crab_size) for img in self.jump_textures]
+        self.death_textures = [pygame.image.load(f'./src/textures/crab-dies{i}.png').convert_alpha() for i in range(1, 4)]
+        self.death_textures = [pygame.transform.scale(img, crab_size) for img in self.death_textures]
 
     def toggle_bubble_mod(self, mp):
         if not self.bubble_mod:
@@ -43,13 +59,7 @@ class Player(GameObj):
             self.before_bubble_offset_y = mp.current_offset_y
             self.before_bubble_pos = [self.pos[0], self.pos[1]]
             self.pos[1] -= 12
-            match self.bubble_color:
-                case 1:
-                    self.load_texture('./src/textures/white_bubble_blue_idle1.png', (32, 32))
-                case 2:
-                    self.load_texture('./src/textures/white_bubble_red_idle1.png', (32, 32))
-                case 3:
-                    self.load_texture('./src/textures/white_bubble_green_idle1.png', (32, 32))
+            self.change_bubble_color(self.bubble_color, True)
         else:
             mp.current_offset_x = self.before_bubble_offset_x
             mp.current_offset_y = self.before_bubble_offset_y
@@ -61,13 +71,30 @@ class Player(GameObj):
 
         self.bubble_mod = not self.bubble_mod
 
-    def change_buble_color(self, color):
+    def change_bubble_color(self, color, force=False):
         self.bubble_color = color
-        if self.bubble_mod:
+        if self.bubble_mod or force:
             match self.bubble_color:
                 case 1:
-                    self.load_texture('./src/textures/white_bubble_blue_idle1.png', (32, 32))
+                    self.load_texture('./src/textures/bubble-white-blue.png', (32, 32))
                 case 2:
-                    self.load_texture('./src/textures/white_bubble_red_idle1.png', (32, 32))
+                    self.load_texture('./src/textures/bubble-white-red.png', (32, 32))
                 case 3:
-                    self.load_texture('./src/textures/white_bubble_green_idle1.png', (32, 32))
+                    self.load_texture('./src/textures/bubble-white-green.png', (32, 32))
+
+    def draw(self, screen):
+        texture = self.texture
+        if not self.bubble_mod:
+            if self.death_time != None:
+                texture = self.death_textures[int(self.death_time / (self.DYING_TIME / len(self.death_textures)))]
+            elif self.jumping:
+                if self.y_momentum < -2:
+                    texture = self.jump_textures[0]
+                elif self.y_momentum > 2:
+                    texture = self.jump_textures[2]
+                else:
+                    texture = self.jump_textures[1]
+            elif self.x_momentum != 0:
+                img_index = pygame.time.get_ticks() * len(self.walk_textures) // 1000 % len(self.walk_textures)
+                texture = self.walk_textures[img_index]
+        screen.blit(texture, self.rect)
