@@ -17,8 +17,11 @@ class Game:
         self.level_num = level_num
         self.playing = True
         self.dt = 0
-        self.font = pygame.font.SysFont("Liberation Sans", 30)
         self.keys = [False] * 500
+
+        self.font = pygame.font.SysFont("Liberation Sans", 30)
+        self.jump_sound = pygame.mixer.Sound('src/audio/jump.wav')
+        self.death_sound = pygame.mixer.Sound('src/audio/death.wav')
 
         try:
             self.map = Map(str(level_num), self.main.screen_size)
@@ -36,9 +39,14 @@ class Game:
 
     def die(self):
         if self.player.death_time == None:
+            self.death_sound.play()
             self.player.death_time = 0
             self.player.pos[1] = min(self.player.pos[1], self.main.screen_size[1] - 20)
             self.player.update_rect()
+
+    def jump(self):
+        self.player.jumping = True
+        self.jump_sound.play()
 
 
     def loop(self):
@@ -306,10 +314,6 @@ class Game:
                     self.player.y_momentum = 0
 
 
-
-
-
-
         # if player goes over the speed limit (exemple: dashes)
         if self.player.x_momentum > self.player.max_x_momentum + 2:
             self.player.x_momentum -= self.player.x_acceleration * dt * 2
@@ -324,7 +328,7 @@ class Game:
             self.player.on_falling_bubble = False
             self.player.collide_bottom = False
             self.player.y_momentum = self.player.jump_power
-            self.player.jumping = True
+            self.jump()
 
     def controls_in_bubble(self, keys):
         if keys[control_keys["RIGHT"]] and keys[control_keys["JUMP"]]:
@@ -345,6 +349,7 @@ class Game:
 
         if (keys[control_keys["RIGHT"]] or keys[control_keys["LEFT"]] or keys[control_keys["UP"]] or keys[control_keys["DOWN"]]) and keys[control_keys["JUMP"]]:
             self.player.in_bubble = False
+            self.jump()
             try:
                 x, y = self.player.bubble_pos
                 self.map.grid[y][x] = 0
