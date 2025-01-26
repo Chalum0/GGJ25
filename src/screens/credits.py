@@ -28,9 +28,10 @@ class Credits:
 
         texts = [
             ("Game created by:", False),
-            ("Snappyink", True),
-            ("Gabibel", True),
-            ("Frigory33", True),
+            ("Snappyink (development)", True),
+            ("Gabibel (art, design)", True),
+            ("Frigory33 (development)", True),
+            ("Krozt (music)", True),
             ("during Global Game Jam 2025", False),
             ("at Université de Bordeaux", False),
             ("CC BY-NC-SA 4.0", False),
