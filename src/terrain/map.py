@@ -17,7 +17,7 @@ class Map:
         5: "bubble-red",  # red bubbles
         6: "bubble-green",  # green bubbles
         7: "bubble-blue",  # blue bubbles
-        8: "checkpoint",  # checkpoint
+        8: ["crabette1", "crabette2"],  # checkpoint
         9: "wall-top",
         10: "wall-bottom",
         11: "wall-topbottom",
@@ -33,8 +33,14 @@ class Map:
         21: "wall-topleftright",
         22: "wall-bottomleftright",
         23: "wall-topbottomleftright",
+        24: "plant1",
+        25: "plant2",
+        26: "plant3",
+        27: "plant4",
+        28: "bigplant1",
+        29: "bigplant2",
     }
-    TRANSPARENT_BLOCKS = [1, 2, 5, 6, 7, 8]
+    TRANSPARENT_BLOCKS = [1, 2, 5, 6, 7, 8, 24, 25, 26, 27, 28, 29]
     HIDDEN_BLOCKS = [1]
     INTERACTION_BLOCKS = [5, 6, 7, 8]
 
@@ -72,7 +78,12 @@ class Map:
                     self.grid[y][x] = 0
 
     def load_textures(self):
-        for name in self.TEXTURES.values():
-            texture = pygame.image.load(f'src/textures/{name}.png').convert_alpha()
-            texture = pygame.transform.scale(texture, (self.tile_size, self.tile_size))
-            self.tiles_texture.append(texture)
+        for names in self.TEXTURES.values():
+            if isinstance(names, list):
+                textures = [pygame.image.load(f'src/textures/{name}.png').convert_alpha() for name in names]
+                textures = [pygame.transform.scale(texture, (self.tile_size, self.tile_size)) for texture in textures]
+                self.tiles_texture.append(textures)
+            else:
+                texture = pygame.image.load(f'src/textures/{names}.png').convert_alpha()
+                texture = pygame.transform.scale(texture, (self.tile_size, self.tile_size))
+                self.tiles_texture.append(texture)

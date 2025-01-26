@@ -1,8 +1,10 @@
 from src.entities.player import Player
 from src.settings.settings import *
 from src.terrain.map import Map
+from src.screens.win import Win
 
 import pygame
+import json
 import time
 import math
 
@@ -15,10 +17,16 @@ class Game:
         self.dt = 0
         self.font = pygame.font.SysFont("Liberation Sans", 30)
 
-        self.map = Map(str(level_num), self.main.screen_size)
-        player_pos = (coord * self.map.tile_size for coord in self.map.player_pos)
-        self.player = Player(player_pos)
-        self.checkpoint_time = None
+        try:
+            self.map = Map(str(level_num), self.main.screen_size)
+            player_pos = (coord * self.map.tile_size for coord in self.map.player_pos)
+            self.player = Player(player_pos)
+            self.checkpoint_time = None
+
+        except: # Game loading failed
+            Win(self.main)
+            self.playing = False
+
 
     def loop(self):
         while self.playing:
@@ -30,6 +38,8 @@ class Game:
             self.check_events()
 
             self.dt = self.main.clock.tick(self.main.max_fps) / 1000
+
+        json.dump(self.level_num, open('src/settings/save.json', 'w'))
 
     def render(self):
         screen = self.main.screen
@@ -48,7 +58,14 @@ class Game:
                 if block != 0:
                     # display
                     if block not in self.map.HIDDEN_BLOCKS:
-                        screen.blit(self.map.tiles_texture[block - 1], (self.map.current_offset_x + x * self.map.tile_size, self.map.current_offset_y + y * self.map.tile_size))
+                        block_x = self.map.current_offset_x + x * self.map.tile_size
+                        block_y = self.map.current_offset_y + y * self.map.tile_size
+                        texture = self.map.tiles_texture[block - 1]
+                        if isinstance(texture, list):
+                            index = pygame.time.get_ticks() // 500 % 2
+                            screen.blit(texture[index], (block_x, block_y))
+                        else:
+                            screen.blit(texture, (block_x, block_y))
 
                     # add collision
                     rect = pygame.rect.Rect(0, 0, self.map.tile_size, self.map.tile_size)
@@ -256,7 +273,4 @@ class Game:
                     self.playing = False
 
         if self.checkpoint_time != None and pygame.time.get_ticks() - self.checkpoint_time >= 2000:
-            if self.level_num < 2:
-                self.__init__(self.main, self.level_num + 1)
-            else:
-                self.playing = False
+            self.__init__(self.main, self.level_num + 1)

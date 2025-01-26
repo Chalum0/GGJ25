@@ -1,13 +1,14 @@
 from src.screens.game import Game
 from src.screens.credits import Credits
 import pygame
+import json
 
 
 class MainMenu:
     def __init__(self, main):
         self.main = main
 
-        self.title_font = pygame.font.SysFont("Liberation Sans", 60)
+        self.title_font = pygame.font.SysFont("Liberation Sans", 60, bold=True)
         self.button_font = pygame.font.SysFont("Liberation Sans", 40)
 
         self.crab = pygame.image.load('src/textures/crab.png')
@@ -15,9 +16,16 @@ class MainMenu:
         self.bubbles = [pygame.image.load(f'src/textures/bubble-{name}.png') for name in ('red', 'green')]
         self.bubbles = [pygame.transform.scale(bubble, (50, 50)) for bubble in self.bubbles]
 
-        self.buttons = [(.43, "Play"), (.63, "Credits"), (.83, "Quit")]
+        self.buttons = [(.35, "Play"), (.51, "Resume"), (.67, "Credits"), (.83, "Quit")]
         self.button_height = self.main.screen_size[1] * .15
         self.cursor = 0
+
+        self.can_resume = False
+        try:
+            json.load(open('src/settings/save.json', 'r'))
+            self.can_resume = True
+        except:
+            pass
 
 
     def loop(self):
@@ -30,8 +38,8 @@ class MainMenu:
             self.main.clock.tick(self.main.max_fps)
 
 
-    def draw_centered_text(self, font, text, relative_y):
-        surface = font.render(text, True, (255, 255, 255))
+    def draw_centered_text(self, font, text, relative_y, color):
+        surface = font.render(text, True, color)
         x = (self.main.screen_size[0] - surface.get_width()) // 2
         y = self.main.screen_size[1] * relative_y - surface.get_height() // 2
         self.main.screen.blit(surface, (x, y))
@@ -42,9 +50,9 @@ class MainMenu:
 
         for bubble, bubble_x in zip(self.bubbles, (.15, .85)):
             bubble_x = self.main.screen_size[0] * bubble_x - bubble.get_width() / 2
-            bubble_y = self.main.screen_size[1] * .2 - bubble.get_height() / 2
+            bubble_y = self.main.screen_size[1] * .15 - bubble.get_height() / 2
             screen.blit(bubble, (bubble_x, bubble_y))
-        self.draw_centered_text(self.title_font, "Bubble Passage", .2)
+        self.draw_centered_text(self.title_font, "Bubble Passage", .15, (255, 255, 255))
 
         for index, (button_y, label) in enumerate(self.buttons):
             if index == self.cursor:
@@ -56,16 +64,24 @@ class MainMenu:
                 screen.blit(self.crab, (crab_x, crab_y))
                 crab_x = self.main.screen_size[0] * .75 - self.crab.get_width() / 2
                 screen.blit(self.crab, (crab_x, crab_y))
-            self.draw_centered_text(self.button_font, label, button_y)
+            color = (192, 192, 192) if index == 1 and not self.can_resume else (255, 255, 255)
+            self.draw_centered_text(self.button_font, label, button_y, color)
 
 
     def press_button(self):
         match self.cursor:
             case 0:
                 Game(self.main).loop()
+                self.can_resume = True
             case 1:
-                Credits(self.main).loop()
+                try:
+                    level_num = json.load(open('src/settings/save.json', 'r'))
+                    Game(self.main, level_num).loop()
+                except:
+                    pass
             case 2:
+                Credits(self.main).loop()
+            case 3:
                 self.main.quit = True
 
     def check_events(self):

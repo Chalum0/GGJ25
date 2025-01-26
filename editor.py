@@ -8,6 +8,8 @@ class Editor:
 
     PLAYER_TILE_INDEX = 0
     WALL_TILE_INDEX = 1
+    PLANT_TILE_INDEX = 8
+    CONVERTED_PLANT_TILE_INDEX = 23
 
     def __init__(self, filename):
         self.filename = filename
@@ -40,7 +42,8 @@ class Editor:
 
 
     def load_textures(self):
-        filenames = ['crab', 'wall', 'urchin', 'urchin', 'bubble-red', 'bubble-green', 'bubble-blue', 'checkpoint']
+        filenames = ['crab', 'wall', 'urchin', 'urchin', 'bubble-red', 'bubble-green', 'bubble-blue', 'crabette1',
+            'plant1', 'plant2', 'plant3', 'plant4', 'bigplant1', 'bigplant2']
         self.textures = [None] * len(filenames)
         for index, name in enumerate(filenames):
             texture = pygame.image.load(f'src/textures/{name}.png').convert_alpha()
@@ -180,8 +183,11 @@ class Editor:
                 for x in range(self.grid_width):
                     tile = self.tiles[y][x]
                     if tile == Editor.WALL_TILE_INDEX:
-                        tile = 7 + self.get_wall_index(x, y)
-                        tile = Editor.WALL_TILE_INDEX if tile == 7 else tile
+                        tile = Editor.PLANT_TILE_INDEX - 1 + self.get_wall_index(x, y)
+                        if tile == Editor.PLANT_TILE_INDEX - 1:
+                            tile = Editor.WALL_TILE_INDEX
+                    elif tile >= Editor.PLANT_TILE_INDEX:
+                        tile += Editor.CONVERTED_PLANT_TILE_INDEX - Editor.PLANT_TILE_INDEX
                     tile += 1
                     tiles[y][x] = tile
             pickle.dump(tiles, file)
@@ -195,7 +201,12 @@ class Editor:
                 for y in range(self.grid_height):
                     for x in range(self.grid_width):
                         tile = self.tiles[y][x] - 1
-                        self.tiles[y][x] = Editor.WALL_TILE_INDEX if tile >= 8 else tile
+                        if tile >= Editor.CONVERTED_PLANT_TILE_INDEX:
+                            self.tiles[y][x] = tile - Editor.CONVERTED_PLANT_TILE_INDEX + Editor.PLANT_TILE_INDEX
+                        elif tile >= Editor.PLANT_TILE_INDEX:
+                            self.tiles[y][x] = Editor.WALL_TILE_INDEX
+                        else:
+                            self.tiles[y][x] = tile
         except:
             pass
 
