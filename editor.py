@@ -86,9 +86,9 @@ class Editor:
         return index
 
     def pixel_pos_to_tile_pos(self, x, y):
-        return ((x - self.scroll_x) // self.tile_width, (y - self.scroll_y) // self.tile_height)
+        return ((x + self.scroll_x) // self.tile_width, (y + self.scroll_y) // self.tile_height)
     def tile_pos_to_pixel_pos(self, x, y):
-        return (x * self.tile_width + self.scroll_x, y * self.tile_height + self.scroll_y)
+        return (x * self.tile_width - self.scroll_x, y * self.tile_height - self.scroll_y)
 
     def texture_pos_px(self, x, y, texture):
         tile_x = self.tile_width * x + (self.tile_width - texture.get_width()) // 2 - self.scroll_x
