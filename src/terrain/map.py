@@ -33,8 +33,14 @@ class Map:
         21: "wall-topleftright",
         22: "wall-bottomleftright",
         23: "wall-topbottomleftright",
+        24: "plant1",
+        25: "plant2",
+        26: "plant3",
+        27: "plant4",
+        28: "bigplant1",
+        29: "bigplant2",
     }
-    TRANSPARENT_BLOCKS = [1, 2, 5, 6, 7, 8]
+    TRANSPARENT_BLOCKS = [1, 2, 5, 6, 7, 8, 24, 25, 26, 27, 28, 29]
     HIDDEN_BLOCKS = [1]
     INTERACTION_BLOCKS = [5, 6, 7, 8]
 
