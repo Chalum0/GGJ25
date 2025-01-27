@@ -1,9 +1,9 @@
 from src.entities.bubble import Bubble
 from src.entities.player import Player
 from src.settings.settings import *
-from src.terrain.map import Map
+from src.map import Map
 from src.screens.win import Win
-from src.util.draw import *
+from src.draw import *
 import pygame
 import json
 import time

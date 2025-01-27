@@ -1,4 +1,4 @@
-from src.util.draw import *
+from src.draw import *
 import pygame
 import random
 

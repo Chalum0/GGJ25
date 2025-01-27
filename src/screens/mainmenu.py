@@ -1,6 +1,6 @@
 from src.screens.game import Game
 from src.screens.credits import Credits
-from src.util.draw import *
+from src.draw import *
 import pygame
 import json
 
