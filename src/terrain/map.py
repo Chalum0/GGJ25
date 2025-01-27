@@ -41,7 +41,7 @@ class Map:
         29: "bigplant2",
     }
     TRANSPARENT_TILES = [1, 2, 3, 4, 5, 6, 7, 8, 24, 25, 26, 27, 28, 29]
-    HIDDEN_TILES = [1]
+    HIDDEN_TILES = [0, 1]
     INTERACTION_TILES = [5, 6, 7, 8]
     DEADLY_TILES = [3, 4]
 
@@ -50,12 +50,12 @@ class Map:
         self.grid = None
         self.player_pos = (0, 0)
         self.load_map(level_name)
-        self.min_offset_x = 0
-        self.max_offset_x = - len(self.grid[0]) * self.tile_size + screen_size[0]
-        self.min_offset_y = 0
-        self.max_offset_y = - len(self.grid) * self.tile_size + screen_size[1]
-        self.current_offset_x = self.min_offset_x
-        self.current_offset_y = self.min_offset_y
+        self.min_scroll_x = 0
+        self.max_scroll_x = max(0, len(self.grid[0]) * self.tile_size - screen_size[0])
+        self.min_scroll_y = 0
+        self.max_scroll_y = max(0, len(self.grid) * self.tile_size - screen_size[1])
+        self.scroll_x = self.min_scroll_x
+        self.scroll_y = self.min_scroll_y
 
         self.tiles_texture = [None]
         self.tiles_rect = []

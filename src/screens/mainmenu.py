@@ -1,5 +1,6 @@
 from src.screens.game import Game
 from src.screens.credits import Credits
+from src.util.draw import *
 import pygame
 import json
 
@@ -45,43 +46,16 @@ class MainMenu:
             self.main.clock.tick(self.main.max_fps)
 
 
-    def draw_centered_text(self, font, text, relative_y, color):
-        surface = font.render(text, True, color)
-        x = (self.main.screen_size[0] - surface.get_width()) // 2
-        y = self.main.screen_size[1] * relative_y - surface.get_height() // 2
-        self.main.screen.blit(surface, (x, y))
-
-    def draw_vertical_gradient(self):
-        top_color = (10, 125, 180)  # LightSkyBlue
-        bottom_color = (0, 25, 60)  # MidnightBlue
-        """Draws a vertical gradient on the given surface."""
-        # Pre-calculate color differences
-        delta_r = bottom_color[0] - top_color[0]
-        delta_g = bottom_color[1] - top_color[1]
-        delta_b = bottom_color[2] - top_color[2]
-
-        for y in range(self.main.screen_size[1]):
-            # Compute interpolation factor from 0.0 (top) to 1.0 (bottom)
-            t = y / self.main.screen_size[1]
-
-            # Interpolate color channel by channel
-            r = int(top_color[0] + (delta_r * t))
-            g = int(top_color[1] + (delta_g * t))
-            b = int(top_color[2] + (delta_b * t))
-
-            # Draw a horizontal line for this row
-            pygame.draw.line(self.main.screen, (r, g, b), (0, y), (self.main.screen_size[0], y))
-
     def render(self):
         screen = self.main.screen
-        self.draw_vertical_gradient()
+        draw_vertical_gradient(self.main)
 
         for bubble_imgs, bubble_x in zip(self.bubbles, (.15, .85)):
             img_index = pygame.time.get_ticks() // (1000 // len(bubble_imgs)) % len(bubble_imgs)
             bubble_x = self.main.screen_size[0] * bubble_x - bubble_imgs[img_index].get_width() / 2
             bubble_y = self.main.screen_size[1] * .15 - bubble_imgs[img_index].get_height() / 2
             screen.blit(bubble_imgs[img_index], (bubble_x, bubble_y))
-        self.draw_centered_text(self.title_font, "Bubble Passage", .15, (255, 255, 255))
+        draw_centered_text(self.main, self.title_font, "Bubble Passage", .15, (255, 255, 255))
 
         for index, (button_y, label) in enumerate(self.buttons):
             if index == self.cursor:
@@ -93,8 +67,10 @@ class MainMenu:
                 screen.blit(self.crab, (crab_x, crab_y))
                 crab_x = self.main.screen_size[0] * .75 - self.crab.get_width() / 2
                 screen.blit(self.crab, (crab_x, crab_y))
-            color = (192, 192, 192) if index == 1 and not self.can_resume else (255, 255, 255)
-            self.draw_centered_text(self.button_font, label, button_y, color)
+            color = (255, 255, 255)
+            if index == 1:
+                color = (160, 160, 160) if not self.can_resume else (255, 255, 0)
+            draw_centered_text(self.main, self.button_font, label, button_y, color)
 
 
     def launch_game(self, level_num):
