@@ -198,9 +198,12 @@ class Editor:
         tile_x = (mouse_x + self.scroll_x) // self.tile_width
         tile_y = (mouse_y + self.scroll_y) // self.tile_height
         if 0 <= tile_x < self.grid_width and 0 <= tile_y < self.grid_height:
-            if mouse_buttons[2]:
+            if mouse_buttons[1]: # Middle button
+                if self.tiles[tile_y][tile_x] >= 0:
+                    self.current_tile = self.tiles[tile_y][tile_x]
+            elif mouse_buttons[2]: # Right button
                 self.tiles[tile_y][tile_x] = -1
-            elif mouse_buttons[0]:
+            elif mouse_buttons[0]: # Left button
                 if isinstance(self.current_tile, list):
                     y = 0
                     while y < len(self.current_tile) and tile_y + y < self.grid_height:
