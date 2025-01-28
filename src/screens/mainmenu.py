@@ -39,6 +39,7 @@ class MainMenu:
 
     def loop(self):
         if len(sys.argv) >= 2:
+            self.main.clock.tick(self.main.max_fps)
             self.launch_game(int(sys.argv[1]))
 
         while not self.main.quit:
