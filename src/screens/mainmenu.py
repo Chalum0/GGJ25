@@ -3,6 +3,7 @@ from src.screens.credits import Credits
 from src.draw import *
 import pygame
 import json
+import sys
 
 
 class MainMenu:
@@ -20,7 +21,7 @@ class MainMenu:
         ]
         self.bubbles = [[pygame.transform.scale(img, (50, 50)) for img in l] for l in self.bubbles]
 
-        self.buttons = [(.35, "Play"), (.51, "Resume"), (.67, "Credits"), (.83, "Quit")]
+        self.buttons = [(.35 + .16 * index, text) for index, text in enumerate(["Play", "Resume", "Credits", "Quit"])]
         self.button_height = self.main.screen_size[1] * .15
         self.cursor = 0
 
@@ -37,6 +38,9 @@ class MainMenu:
 
 
     def loop(self):
+        if len(sys.argv) >= 2:
+            self.launch_game(int(sys.argv[1]))
+
         while not self.main.quit:
             self.render()
             pygame.display.flip()

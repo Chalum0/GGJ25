@@ -6,7 +6,6 @@ from src.screens.win import Win
 from src.draw import *
 import pygame
 import json
-import time
 import math
 from typing import Any
 
@@ -381,7 +380,6 @@ class Game:
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                time.sleep(0.5)
                 self.playing = False
                 self.main.quit = True
 
