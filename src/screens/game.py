@@ -32,7 +32,7 @@ class Game:
             self.player = Player(player_pos)
             self.checkpoint_time = None
 
-        except: # Map loading failed
+        except: # For when map loading fails
             Win(self.main)
             self.playing = False
 
@@ -190,6 +190,7 @@ class Game:
                     player.y_momentum = -min(player.y_momentum * 1.3, player.max_y_momentum/1.2)
                     x, y = self.player.bubble_pos
                     self.map.grid[y][x] = 0
+                    self.bubble_burst_sound.play()
                 elif ttyp == self.map.INTERACTION_TILES_ID["blue-bubble"]:
                     player.x_momentum = 0
                     player.y_momentum = 0
@@ -219,6 +220,7 @@ class Game:
                     player.x_momentum = -player.x_momentum * 2
                     player.y_momentum = -min(player.y_momentum * 1.3, player.max_y_momentum / 1.2)
                     self.map.placed_bubbles.remove(bubble)
+                    self.bubble_burst_sound.play()
 
         if not player.bubble_mode:
             for tile in self.map.interaction_tiles_rect:
@@ -233,6 +235,7 @@ class Game:
             for bubble in self.map.placed_bubbles:
                 if self.player.bubble_color == bubble.color and player.rect.colliderect(bubble.rect):
                     self.map.placed_bubbles.remove(bubble)
+                    self.bubble_burst_sound.play()
 
     def bubble_falling(self):
         for bubble in self.map.placed_bubbles:
@@ -240,15 +243,7 @@ class Game:
                 bubble.pos[1] += self.dt * 30
             bubble.update_rect()
             bubble.update_texture()
-
-            """
-            ???
-            for tile in self.map.tiles_rect:
-                if tile.collidepoint(bubble.rect.center):
-                    self.map.placed_bubbles.remove(bubble)
-                    break
-            """
-            if bubble.rect.bottom >= len(self.map.grid) * self.map.tile_size:
+            if bubble.rect.top >= len(self.map.grid) * self.map.tile_size:
                 self.map.placed_bubbles.remove(bubble)
 
 
@@ -320,6 +315,7 @@ class Game:
                 self.player.y_momentum = 10
             if self.keys[control_keys["RIGHT"]] or self.keys[control_keys["LEFT"]] or self.keys[control_keys["UP"]] or self.keys[control_keys["DOWN"]]:
                 self.player.in_bubble = False
+                self.bubble_burst_sound.play()
                 self.jump()
                 try:
                     x, y = self.player.bubble_pos
@@ -379,6 +375,7 @@ class Game:
         x = self.player.rect.centerx + dx
         y = self.player.rect.centery + dy
         self.map.placed_bubbles.append(Bubble(self.player.bubble_color, [x, y]))
+        self.bubble_spawn_sound.play()
 
     def check_events(self):
         for event in pygame.event.get():
@@ -404,11 +401,11 @@ class Game:
                     distance = 50
                     if event.scancode == control_keys["SPAWN_BUBBLE_UP"]:
                         self.place_bubble(0, -distance)
-                    if event.scancode == control_keys["SPAWN_BUBBLE_DOWN"]:
+                    elif event.scancode == control_keys["SPAWN_BUBBLE_DOWN"]:
                         self.place_bubble(0, distance)
-                    if event.scancode == control_keys["SPAWN_BUBBLE_LEFT"]:
+                    elif event.scancode == control_keys["SPAWN_BUBBLE_LEFT"]:
                         self.place_bubble(-distance, 0)
-                    if event.scancode == control_keys["SPAWN_BUBBLE_RIGHT"]:
+                    elif event.scancode == control_keys["SPAWN_BUBBLE_RIGHT"]:
                         self.place_bubble(distance, 0)
 
             elif event.type == pygame.KEYUP:
