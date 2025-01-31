@@ -21,12 +21,14 @@ class Game:
         self.font = pygame.font.SysFont("Liberation Sans", 30)
         self.jump_sound = pygame.mixer.Sound('src/audio/jump.wav')
         self.death_sound = pygame.mixer.Sound('src/audio/death.wav')
+        self.bubble_spawn_sound = pygame.mixer.Sound('src/audio/bubble-spawn.wav')
+        self.bubble_burst_sound = pygame.mixer.Sound('src/audio/bubble-burst.wav')
 
         json.dump(self.level_num, open('src/settings/save.json', 'w'))
 
         try:
             self.map = Map(str(level_num), self.main.screen_size)
-            player_pos = (coord * self.map.tile_size for coord in self.map.player_pos)
+            player_pos = [coord * self.map.tile_size for coord in self.map.player_pos]
             self.player = Player(player_pos)
             self.checkpoint_time = None
 
@@ -42,7 +44,8 @@ class Game:
         if self.player.death_time == None:
             self.death_sound.play()
             self.player.death_time = 0
-            self.player.pos[1] = min(self.player.pos[1], self.main.screen_size[1] - 20)
+            level_bottom = len(self.map.grid) * self.map.tile_size
+            self.player.pos[1] = min(self.player.pos[1], level_bottom - 20)
             self.player.update_rect()
 
     def jump(self):
