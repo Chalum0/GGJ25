@@ -1,4 +1,5 @@
 from src.screens.game import Game
+from src.screens.instructions import InstructionsScreen
 from src.screens.credits import Credits
 from src.draw import *
 import pygame
@@ -21,8 +22,9 @@ class MainMenu:
         ]
         self.bubbles = [[pygame.transform.scale(img, (50, 50)) for img in l] for l in self.bubbles]
 
-        self.buttons = [(.35 + .16 * index, text) for index, text in enumerate(["Play", "Resume", "Credits", "Quit"])]
-        self.button_height = self.main.screen_size[1] * .15
+        button_texts = ["Play", "Resume", "Instructions", "Credits", "Quit"]
+        self.buttons = [(.32 + .14 * index, text) for index, text in enumerate(button_texts)]
+        self.button_height = self.main.screen_size[1] * .14
         self.cursor = 0
 
         self.game_ambiance = pygame.mixer.Sound('src/audio/game-ambiance.ogg')
@@ -99,8 +101,10 @@ class MainMenu:
                 except:
                     pass
             case 2:
-                Credits(self.main).loop()
+                InstructionsScreen(self.main).loop()
             case 3:
+                Credits(self.main).loop()
+            case 4:
                 self.main.quit = True
 
     def check_events(self):

@@ -15,7 +15,7 @@ class Editor:
         self.filename = filename
 
         pygame.init()
-        pygame.display.set_caption("Bubble Passage Editor")
+        pygame.display.set_caption(f"Bubble Passage Editor — {filename}")
         self.screen = pygame.display.set_mode((1080, 720), flags=pygame.RESIZABLE)
         pygame.display.set_icon(pygame.image.load('src/textures/crab.png'))
         self.clock = pygame.time.Clock()
