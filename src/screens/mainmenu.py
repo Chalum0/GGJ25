@@ -35,6 +35,7 @@ class MainMenu:
         try:
             json.load(open('src/settings/save.json', 'r'))
             self.can_resume = True
+            self.cursor = 1
         except:
             pass
 
