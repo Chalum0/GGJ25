@@ -392,9 +392,7 @@ class Game:
                     self.playing = False
                     
                 if event.scancode == control_keys["BUBBLE"]:
-                    if self.player.in_bubble:
-                        self.player.toggle_bubble_mode(self.map)
-                    elif self.player.x_momentum == 0 and -0.5 < self.player.y_momentum < 0.5:
+                    if not self.player.in_bubble and self.player.x_momentum == 0 and -0.5 < self.player.y_momentum < 0.5:
                         self.player.toggle_bubble_mode(self.map)
 
                 if len(self.map.placed_bubbles) < 3 and self.player.bubble_mode:
