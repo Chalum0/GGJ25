@@ -17,7 +17,7 @@ class InstructionsScreen:
         ],
         [
             "Starting from level 5, you will have to place bubbles yourself.",
-            "Press A to toggle bubble placement mode.",
+            "Press Q (qwerty) to toggle bubble placement mode.",
             "Move with W, A, S, D and press an arrow key to put a bubble.",
             "Press 1, 2, 3 to choose the color of the bubbles you put.",
             "You can have 3 put bubbles at most.",
