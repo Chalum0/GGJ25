@@ -22,3 +22,5 @@ class GameObj:
 
     def update_rect(self):
         self.rect.topleft = self.pos
+        self.rect.width = self.texture.get_width()
+        self.rect.height = self.texture.get_height()
